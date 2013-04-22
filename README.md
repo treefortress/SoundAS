@@ -7,7 +7,7 @@ A modern lightweight sound manager for AS3.
 
 SoundAS has an API designed to ease management of Sounds within your AS3 projects. It is built to allow you to manage multiple streams of audio very easily, fadeing them in and out as required, or layering them as you need.
 
-* *SoundAS* - This is the main Static class, responsible for loading and controlling all sounds globally. You can use this class to initiate playback, or simply to get a SoundInstance to work with.
+* _SoundAS_ - This is the main Static class, responsible for loading and controlling all sounds globally. You can use this class to initiate playback, or simply to get a SoundInstance to work with.
 * _SoundInstance_ - Returned each time a new sound is played. SoundInstance is responsible for controlling playback of individual sounds, allowing you to easily stop, start, change volume, or set position.
 
 #Loading
@@ -23,10 +23,10 @@ SoundAS has an API designed to ease management of Sounds within your AS3 project
     //Play, by default does not allow multiple instances of a song.
     SoundAS.play("click", volume, startTime, loops, allowMultiple, allowInterrupt);
 
-    //Play Sound which doesn't loop and allows for multiple instances (typical game sound-fx)
+    //Shortcut for typical game fx (doesn't loop, allows for overlapping instances)
     SoundAS.playFx("click");
 
-     //Play Sound which loops, and does not allows for multiple instances (typical game loop)
+    //Shortcut for typical game music (loops forever, does not allow for overlapping instances)
     SoundAS.playLoop("click");
 
     //Toggle Mute 
