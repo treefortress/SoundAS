@@ -43,6 +43,14 @@ Playback:
 ##SoundInstance
 Controls playback of individual sounds, allowing you to easily stop, start, resume and set volume or position.
 
+*     **play**(volume:Number = 1, startTime:int = -1, loops:int = 0, allowMultiple:Boolean = true):SoundInstance
+*     fadeFrom(startVolume:Number, endVolume:Number, duration:Number = 1000):SoundInstance
+*     fadeTo(endVolume:Number, duration:Number = 1000):SoundInstance
+*     **pause**():void
+*     **resume**():void
+*     **stop**():void
+*     **destroy**():void
+
 #Code Examples
 
 ###Loading
