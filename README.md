@@ -22,9 +22,12 @@ SoundAS has an API designed to ease management of Sounds within your AS3 project
 
 #Basic Playback
 
-    //Play, by default does not allow multiple instances of a Sound.
+    //Play sound.
+        //allowMultiple: Allow multiple overlapping sound instances.
+        //allowInterrupt: If this sound is currently playing, start it over.
     SoundAS.play("click", volume, startTime, loops, allowMultiple, allowInterrupt);
 
+    
     //Shortcut for typical game fx (doesn't loop, allows for overlapping instances)
     SoundAS.playFx("click");
 
