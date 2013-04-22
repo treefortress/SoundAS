@@ -1,4 +1,4 @@
-[license]: https://github.com/rafaelrinaldi/sound-manager/raw/master/license.txt
+[license]: https://github.com/treefortress/SoundAS/raw/master/license.txt
 
 SoundAS
 =======
