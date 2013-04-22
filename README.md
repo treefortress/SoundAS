@@ -15,9 +15,9 @@ The goal of SoundAS is to simplifying playback of your audio files, with a focus
 
 #API Overview
 
-Full documentation can be found here: http://treefortress.com/libs/SoundAS/docs/
+Full documentation can be found here: http://treefortress.com/libs/SoundAS/docs/.
 
-##SoundAS
+###SoundAS
 This Static Class is the main interface for the library. It's responsible for loading and controlling all sounds globally.
 
 Loading / Unloading: 
@@ -42,7 +42,7 @@ Playback:
 *    **fadeTo**(type:String, endVolume:Number = 1, duration:Number = 1000):SoundInstance
 *    **fadeAllTo**(endVolume:Number = 1, duration:Number = 1000):SoundInstance
 
-##SoundInstance
+####SoundInstance
 Controls playback of individual sounds, allowing you to easily stop, start, resume and set volume or position.
 
 *     **play**(volume:Number = 1, startTime:int = -1, loops:int = 0, allowMultiple:Boolean = true):SoundInstance
