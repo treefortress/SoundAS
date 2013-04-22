@@ -49,6 +49,8 @@ Controls playback of individual sounds, allowing you to easily stop, start, resu
 *     **pause**():SoundInstance
 *     **resume**():SoundInstance
 *     **stop**():SoundInstance
+*     **set volume**(value:Number):void
+*     **set mute**(value:Boolean):void
 *     **fadeFrom**(startVolume:Number, endVolume:Number, duration:Number = 1000):SoundInstance
 *     **fadeTo**(endVolume:Number, duration:Number = 1000):SoundInstance
 *     **destroy**():void
