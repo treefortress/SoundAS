@@ -3,16 +3,19 @@ SoundAS
 
 A modern lightweight sound manager for AS3. 
 
-API Overview
+#API Overview
 
-###SoundAS.loadSound(url:String, type:String)
-Load an external path;
+Loading Sounds:
 
-###SoundAS.addSound(sound:Sound, type:String)
-Inject a sound you've loaded externally.
+* SoundAS.loadSound(url:String, type:String)
+* SoundAS.addSound(url:String, type:String)
 
-###SoundAS.play(type:String, volume:Number = 1, startTime:Number = -1, loops:int = 0, allowMultiple:Boolean = false, allowInterrupt:Boolean = true)
-The core play function for the library. 
+Playback: 
+
+* SoundAS.play(type:String, volume:Number = 1, startTime:Number = -1, loops:int = 0, allowMultiple:Boolean = false, allowInterrupt:Boolean = true)
+* SoundAS.playFx(type:String, volume:Number = 1, startTime:Number = -1, loops:int = 0)
+* SoundAS.playLoop(type:String, volume:Number = 1, startTime:Number = -1, loops:int = 0)
+* SoundAS.resume(type:String, volume:Number = 1, startTime:Number = -1, loops:int = 0)
 
 #Basic Usage
 
