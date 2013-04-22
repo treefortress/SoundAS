@@ -27,7 +27,8 @@ Loading / Unloading:
 Playback:
 
 *    getSound(type:String, forceNew:Boolean = false):SoundInstance
-*    play(type:String, volume:Number = 1, startTime:Number = -1, loops:int = 0, allowMultiple:Boolean = false, allowInterrupt:Boolean = true):SoundInstance
+*    play(type:String, volume:Number = 1, startTime:Number = -1, loops:int = 0, 
+     allowMultiple:Boolean = false, allowInterrupt:Boolean = true):SoundInstance
 *    playFx(type:String, volume:Number = 1, startTime:Number = -1, loops:int = 0):SoundInstance
 *    playLoop(type:String, volume:Number = 1, startTime:Number = -1):SoundInstance
 *    resume(type:String, volume:Number = 1, startTime:Number = -1, loops:int = 0):SoundInstance
