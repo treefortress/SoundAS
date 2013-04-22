@@ -27,11 +27,10 @@ SoundAS has an API designed to ease management of Sounds within your AS3 project
         //allowInterrupt: If this sound is currently playing, start it over.
     SoundAS.play("click", volume, startTime, loops, allowMultiple, allowInterrupt);
 
-    
-    //Shortcut for typical game fx (doesn't loop, allows for overlapping instances)
+    //Shortcut for typical game fx (no looping, allows for multiple instances)
     SoundAS.playFx("click");
 
-    //Shortcut for typical game music (loops forever, does not allow for overlapping instances)
+    //Shortcut for typical game music (loops forever, no multiple instances)
     SoundAS.playLoop("click");
 
     //Toggle Mute 
