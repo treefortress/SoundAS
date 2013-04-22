@@ -5,7 +5,7 @@ A modern lightweight sound manager for AS3.
 
 #API Overview
 
-SoundAS has API designed to facilitate extremely easy management of Sounds within your AS3 projects. It is built to allow you to manage multiple streams of audio very easily, fadeing them in and out as required, or layering them as you need.
+SoundAS has an API designed to ease management of Sounds within your AS3 projects. It is built to allow you to manage multiple streams of audio very easily, fadeing them in and out as required, or layering them as you need.
 
 * _SoundAS_ - This is the main Static class, responsible for loading and controlling all sounds globally. You can use this class to initiate playback, or simply to retreice a SoundInstance to work with.
 * _SoundInstance_ - Is returned each time a new sound is played. SoundInstance is responsible for controlling playback of individual sounds, allowing you to easily stop, start, change volume, or set position of any sound.
