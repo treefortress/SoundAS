@@ -81,10 +81,67 @@ package treefortress.sound
 		}
 		
 		/**
-		 * Resume the sound if it's currently playing, otherwise start from beginning.
+		 * Resume specific sound 
 		 */
-		public static function resume(type:String, volume:Number = 1, startTime:Number = -1, loops:int = 0):SoundInstance {
-			return play(type, volume, startTime, 0, true);
+		public static function resume(type:String):SoundInstance {
+			return getSound(type).resume();
+		}
+		
+		/**
+		 * Resume all paused instances.
+		 */
+		public static function resumeAll():void {
+			for(var i:int = 0, l:int = instances.length; i < l; i++){
+				instances[i].resume();
+			}
+		}
+		
+		/** 
+		 * Pause a specific sound 
+		 **/
+		public static function pause(type:String):SoundInstance {
+			return getSound(type).pause();
+		}
+		
+		/**
+		 * Pause all sounds
+		 */
+		public static function pauseAll():void {
+			for(var i:int = 0, l:int = instances.length; i < l; i++){
+				instances[i].pause();
+			}
+		}
+		
+		/** 
+		 * Fade specific sound starting at the current volume
+		 **/
+		public static function fadeTo(type:String, endVolume:Number = 1, duration:Number = 1000):SoundInstance {
+			return getSound(type).fadeTo(endVolume, duration);
+		}
+		
+		/**
+		 * Fade all sounds starting from their current Volume
+		 */
+		public static function fadeAllTo(endVolume:Number = 1, duration:Number = 1000):void {
+			for(var i:int = 0, l:int = instances.length; i < l; i++){
+				instances[i].fadeTo(endVolume, duration);
+			}
+		}
+		
+		/** 
+		 * Fade specific sound specifying both the StartVolume and EndVolume.
+		 **/
+		public static function fadeFrom(type:String, startVolume:Number = 0, endVolume:Number = 1, duration:Number = 1000):SoundInstance {
+			return getSound(type).fadeFrom(startVolume, endVolume, duration);
+		}
+		
+		/**
+		 * Fade all sounds specifying both the StartVolume and EndVolume.
+		 */
+		public static function fadeAllFrom(startVolume:Number = 0, endVolume:Number = 1, duration:Number = 1000):void {
+			for(var i:int = 0, l:int = instances.length; i < l; i++){
+				instances[i].fadeFrom(startVolume, endVolume, duration);
+			}
 		}
 		
 		/**

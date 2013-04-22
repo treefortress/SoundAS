@@ -68,10 +68,11 @@ package treefortress.sound
 		 * @param loops Number of times to loop Sound. Pass -1 to loop forever.
 		 * @param allowMultiple Allow multiple concurrent instances of this Sound
 		 */
-		public function play(volume:Number = 1, startTime:int = -1, loops:int = 0, allowMultiple:Boolean = true):void {
+		public function play(volume:Number = 1, startTime:int = -1, loops:int = 0, allowMultiple:Boolean = true):SoundInstance {
 			
 			this.loops = loops;
 			this.allowMultiple = allowMultiple;
+			
 			if(allowMultiple){
 				channel = sound.play(startTime, loops);
 			} else {
@@ -79,35 +80,40 @@ package treefortress.sound
 					pauseTime = channel.position;
 					stopChannel(channel);
 				}
- 				channel = sound.play(startTime, loops);
+ 				channel = sound.play(startTime, loops == -1? 0 : loops);
 			}
 			channel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
 			this.volume = volume;	
 			this.mute = mute;
+			return this;
 		}
 		
 		/**
 		 * Pause currently playing sound. Use resume() to continue playback.
 		 */
-		public function pause():void {
+		public function pause():SoundInstance {
+			if(!channel){ return this; }
 			pauseTime = channel.position;
 			channel.stop();
+			return this;
 		}
 
 		
 		/**
 		 * Resume from previously paused time, or start over if it's not playing.
 		 */
-		public function resume():void {
+		public function resume():SoundInstance {
 			play(_volume, pauseTime, loops, allowMultiple);
+			return this;
 		}
 		
 		/**
 		 * Stop the currently playing sound and set it's position to 0
 		 */
-		public function stop():void {
+		public function stop():SoundInstance {
 			pauseTime = 0;
 			channel.stop();
+			return this;
 		}
 		
 		/**
@@ -124,15 +130,17 @@ package treefortress.sound
 		/**
 		 * Fade using the current volume as the Start Volume
 		 */
-		public function fadeTo(endVolume:Number, duration:Number = 1000):void {
+		public function fadeTo(endVolume:Number, duration:Number = 1000):SoundInstance {
 			SoundAS.addTween(type, -1, endVolume, duration);
+			return this;
 		}
 		
 		/**
 		 * Fade and specify both the Start Volume and End Volume.
 		 */
-		public function fadeFrom(startVolume:Number, endVolume:Number, duration:Number = 1000):void {
+		public function fadeFrom(startVolume:Number, endVolume:Number, duration:Number = 1000):SoundInstance {
 			SoundAS.addTween(type, startVolume, endVolume, duration);
+			return this;
 		}
 		
 		/**
@@ -165,7 +173,9 @@ package treefortress.sound
 			if(value < 0){ value = 0; } else if(value > 1){ value = 1; }
 			if(!soundTransform){ soundTransform = new SoundTransform(); }
 			soundTransform.volume = value;
-			channel.soundTransform = soundTransform;
+			if(channel){
+				channel.soundTransform = soundTransform;
+			}
 		}
 		
 		/**
@@ -182,6 +192,9 @@ package treefortress.sound
 		 */
 		protected function onSoundComplete(event:Event):void {
 			soundCompleted.dispatch(this);
+			if(loops == -1 && (event.target as SoundChannel) == channel){
+				play(_volume, 0, -1, allowMultiple);
+			}
 		}
 		
 		/**
