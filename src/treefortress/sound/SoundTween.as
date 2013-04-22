@@ -1,7 +1,6 @@
 package treefortress.sound
 {
 	import flash.utils.getTimer;
-	import treefortress.sound.SoundInstance;
 	
 	public class SoundTween {
 		

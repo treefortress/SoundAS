@@ -4,7 +4,6 @@ package treefortress.sound
 	import flash.media.Sound;
 	import flash.media.SoundChannel;
 	import flash.media.SoundTransform;
-	import flash.utils.getTimer;
 	
 	import org.osflash.signals.Signal;
 
@@ -18,11 +17,13 @@ package treefortress.sound
 		public var soundCompleted:Signal;
 		public var soundTransform:SoundTransform;
 		
+		public var loops:int;
+		public var allowMultiple:Boolean;
+		
 		protected var _muted:Boolean;
 		protected var _volume:Number;
 		protected var pauseTime:Number;
 		protected var _position:int;
-		protected var loops:int;
 		
 		public function SoundInstance(sound:Sound = null){
 			pauseTime = 0;
@@ -37,6 +38,7 @@ package treefortress.sound
 		public function play(volume:Number = 1, startTime:int = -1, loops:int = 0, allowMultiple:Boolean = true):void {
 			
 			this.loops = loops;
+			this.allowMultiple = allowMultiple;
 			if(allowMultiple){
 				channel = sound.play(startTime, loops);
 			} else {
@@ -53,6 +55,10 @@ package treefortress.sound
 		
 		protected function onSoundComplete(event:Event):void {
 			soundCompleted.dispatch(this);
+		}
+		
+		public function resume():void {
+			play(_volume, pauseTime, loops, allowMultiple);
 		}
 		
 		public function stop():void {
