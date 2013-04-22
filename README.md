@@ -35,7 +35,7 @@ Playback:
 *    **resumeAll**():void
 *    **pause**(type:String):SoundInstance
 *    **pauseAll**():void
-*    **fadeFrom**(type:String, startVolume:Number = 0, endVolume:Number = 1, duration:Number = 1000)
+*    **fadeFrom**(type:String, startVolume:Number = 0, endVolume:Number = 1, duration:Number = 1000)    
 *    **fadeAllFrom**(startVolume:Number = 0, endVolume:Number = 1, duration:Number = 1000)
 *    **fadeTo**(type:String, endVolume:Number = 1, duration:Number = 1000):SoundInstance
 *    **fadeAllTo**(endVolume:Number = 1, duration:Number = 1000):SoundInstance
@@ -44,8 +44,8 @@ Playback:
 Controls playback of individual sounds, allowing you to easily stop, start, resume and set volume or position.
 
 *     **play**(volume:Number = 1, startTime:int = -1, loops:int = 0, allowMultiple:Boolean = true):SoundInstance
-*     fadeFrom(startVolume:Number, endVolume:Number, duration:Number = 1000):SoundInstance
-*     fadeTo(endVolume:Number, duration:Number = 1000):SoundInstance
+*     **fadeFrom**(startVolume:Number, endVolume:Number, duration:Number = 1000):SoundInstance
+*     **fadeTo**(endVolume:Number, duration:Number = 1000):SoundInstance
 *     **pause**():void
 *     **resume**():void
 *     **stop**():void
