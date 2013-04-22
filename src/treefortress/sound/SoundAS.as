@@ -110,16 +110,6 @@ package treefortress.sound
 		}
 		
 		/**
-		 * Unload all Sound instances.
-		 */
-		public static function unloadAll():void {
-			for(var i:int = 0; i < instances.length; i++){
-				instances[i].destroy();
-			}
-			init();
-		}
-		
-		/**
 		 * Returns a SoundInstance for a specific type.
 		 */
 		public static function getSound(type:String, forceNew:Boolean = false):SoundInstance {
@@ -169,6 +159,16 @@ package treefortress.sound
 					instances.splice(i, 1);
 				}
 			}
+		}
+		
+		/**
+		 * Unload all Sound instances.
+		 */
+		public static function removeAll():void {
+			for(var i:int = 0; i < instances.length; i++){
+				instances[i].destroy();
+			}
+			init();
 		}
 		
 		/**

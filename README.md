@@ -17,6 +17,21 @@ The goal of SoundAS is to simplifying playback of your audio files, with a focus
 ##SoundAS
 This Static Class is the main interface for the library. It's responsible for loading and controlling all sounds globally.
 
+Loading / Unloading: 
+
+** addSound(type:String, sound:Sound):void
+** loadSound(url:String, type:String, buffer:int = 100):void
+** removeSound(type:String):void
+** removeAll():void
+
+Playback:
+
+** getSound(type:String, forceNew:Boolean = false):SoundInstance
+** play(type:String, volume:Number = 1, startTime:Number = -1, loops:int = 0, allowMultiple:Boolean = false, allowInterrupt:Boolean = true):SoundInstance
+** playFx(type:String, volume:Number = 1, startTime:Number = -1, loops:int = 0):SoundInstance
+** playLoop(type:String, volume:Number = 1, startTime:Number = -1):SoundInstance
+** resume(type:String, volume:Number = 1, startTime:Number = -1, loops:int = 0):SoundInstance
+
 
 ##SoundInstance
 Controls playback of individual sounds, allowing you to easily stop, start, resume and set volume or position.
