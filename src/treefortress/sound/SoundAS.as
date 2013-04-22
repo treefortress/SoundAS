@@ -30,14 +30,43 @@ package treefortress.sound
 			ticker.addEventListener(Event.ENTER_FRAME, onTick);
 		}
 		
+		
 		/**
-		 * PUBLIC
+		 * Dispatched when an external Sound has completed loading. 
 		 */
 		public static var loadCompleted:Signal;
+		
+		/**
+		 * Dispatched when an external Sound has failed loading. 
+		 */
 		public static var loadFailed:Signal;
 		
 		/**
+		 * Play audio by type. It must already be loaded into memory using the addSound() or loadSound() APIs. 
+		 * @param type
+		 * @param volume
+		 * @param startTime Starting time in milliseconds
+		 * @param loops Number of times to loop audio, pass -1 to loop forever.
+		 * @param allowMultiple Allow multiple, overlapping instances of this Sound (useful for SoundFX)
+		 * @param allowInterrupt If this sound is currently playing, interrupt it and start at the specified StartTime. Otherwise, just update the Volume.
+		 */
+		public static function play(type:String, volume:Number = 1, startTime:Number = -1, loops:int = 0, allowMultiple:Boolean = false, allowInterrupt:Boolean = true):SoundInstance {
+			var si:SoundInstance = getSound(type);
+			
+			//Sound is playing, and we're not allowed to interrupt it. Just set volume.
+			if(!allowInterrupt && si.isPlaying){
+				si.volume = volume;
+			} 
+				//Play sound
+			else {
+				si.play(volume, startTime, loops, allowMultiple);
+			}
+			return si;
+		}
+		
+		/**
 		 * Convenience function to play a sound that should loop forever.
+		 * 
 		 */
 		public static function playLoop(type:String, volume:Number = 1, startTime:Number = -1):SoundInstance {
 			return play(type, volume, startTime, -1, false);
@@ -45,6 +74,7 @@ package treefortress.sound
 		
 		/**
 		 * Convenience function to play a sound that can have overlapping instances (ie click or soundFx).
+		 * 
 		 */
 		public static function playFx(type:String, volume:Number = 1, startTime:Number = -1, loops:int = 0):SoundInstance {
 			return play(type, volume, startTime, 0, true);
@@ -55,23 +85,6 @@ package treefortress.sound
 		 */
 		public static function resume(type:String, volume:Number = 1, startTime:Number = -1, loops:int = 0):SoundInstance {
 			return play(type, volume, startTime, 0, true);
-		}
-		
-		/**
-		 * Play a sound by type. The sound must already be loaded before this is called.
-		 */
-		public static function play(type:String, volume:Number = 1, startTime:Number = -1, loops:int = 0, allowMultiple:Boolean = false, allowInterrupt:Boolean = true):SoundInstance {
-			var si:SoundInstance = getSound(type);
-			
-			//Sound is playing, and we're not allowed to interrupt it. Just set volume.
-			if(!allowInterrupt && si.isPlaying){
-				si.volume = volume;
-			} 
-			//Play sound
-			else {
-				si.play(volume, startTime, loops, allowMultiple);
-			}
-			return si;
 		}
 		
 		/**
@@ -120,6 +133,10 @@ package treefortress.sound
 		
 		/**
 		 * Preload a sound from a URL or Local Path
+		 * @param url External file path to the sound instance.
+		 * @param type 
+		 * @param buffer
+		 * 
 		 */
 		public static function loadSound(url:String, type:String, buffer:int = 100):void {
 			var si:SoundInstance = new SoundInstance();
@@ -140,6 +157,18 @@ package treefortress.sound
 			si.type = type;
 			si.sound = sound;
 			addInstance(si);
+		}
+		
+		/**
+		 * Remove a sound from memory.
+		 */
+		public static function removeSound(type:String):void {
+			for(var i:int = instances.length - 1; i >= 0; i--){
+				if(instances[i].type == type){
+					instances[i].destroy();
+					instances.splice(i, 1);
+				}
+			}
 		}
 		
 		/**

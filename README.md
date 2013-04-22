@@ -5,14 +5,25 @@ SoundAS
 
 A modern lightweight sound manager for AS3. 
 
+The goal of SoundAS is to simplifying playback of your audio files, with a focus on easily transitioning from one to another, and differentiating between SoundFX and Music Loops.
+
+#Features
+* Clean modern API
+* Built-in Tweening system, no dependancies
+* Easy memory management
+
 #API Overview
 
-SoundAS has an API designed to ease management of Sounds within your AS3 projects. It is built to allow you to manage multiple streams of audio very easily, fadeing them in and out as required, or layering them as you need.
+##SoundAS
+This Static Class is the main interface for the library. It's responsible for loading and controlling all sounds globally.
 
-* _SoundAS_ - Static class, responsible for loading and controlling all sounds globally. You can use this class to initiate playback, or simply to get a SoundInstance to work with.
-* _SoundInstance_ - This class controls playback of individual sounds, allowing you to easily stop, start, resume and set volume or position. These are returned each time a sound is played, or can be accessed by calling SoundAS.getSound(). 
 
-#Loading
+##SoundInstance
+Controls playback of individual sounds, allowing you to easily stop, start, resume and set volume or position.
+
+#Code Examples
+
+###Loading
 
     //Load sound from an external file
     SoundAS.loadSound("assets/Click.mp3", "click");
@@ -20,7 +31,7 @@ SoundAS has an API designed to ease management of Sounds within your AS3 project
     //Inject an already loaded Sound instance
     SoundAS.addSound(clickSound, "click");
 
-#Basic Playback
+###Basic Playback
 
     //Play sound.
         //allowMultiple: Allow multiple overlapping sound instances.
@@ -39,7 +50,7 @@ SoundAS has an API designed to ease management of Sounds within your AS3 project
     //Fade Out
     SoundAS.getSound("click").fadeTo(0);
 
-#Advanced Playback 
+###Advanced 
 
     //Mute one sound
     SoundsAS.getSound("click").mute = true;
