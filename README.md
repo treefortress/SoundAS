@@ -1,3 +1,5 @@
+[license]: https://github.com/rafaelrinaldi/sound-manager/raw/master/license.txt
+
 SoundAS
 =======
 
@@ -50,6 +52,7 @@ SoundAS has an API designed to ease management of Sounds within your AS3 project
     sound.volume = .5; 
 	sound.fadeTo(0);
 
-
-
+---
+### License
+[WTFPL][license]
 
