@@ -10,8 +10,11 @@ A modern lightweight sound manager for AS3.
     //Load sound from an external file
     SoundAS.loadSound("assets/Click.mp3", "click");
 
+    //Inject an already loaded sound
+    SoundAS.addSound(clickSound, "click");
+
     //Play
-    SoundAS.play("click");
+    SoundAS.play("click", volume, startTime, loops, allowMultiple, allowInterrupt);
 
     //Toggle Mute 
     SoundAS.mute = !SoundAS.mute;
