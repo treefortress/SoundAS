@@ -57,7 +57,7 @@ Controls playback of individual sounds, allowing you to easily stop, start, resu
 *     **fadeFrom**(startVolume:Number, endVolume:Number, duration:Number = 1000):SoundInstance
 *     **fadeTo**(endVolume:Number, duration:Number = 1000):SoundInstance
 *     **destroy**():void
-*     **endFade(applyEndVolume:Boolean = false):SoundInstance
+*     **endFade**(applyEndVolume:Boolean = false):SoundInstance
 
 #Code Examples
 
