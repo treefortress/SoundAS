@@ -45,17 +45,21 @@ package treefortress.sound
 		 */
 		public var allowMultiple:Boolean;
 		
-		protected var soundTransform:SoundTransform;
+		
 		protected var _muted:Boolean;
 		protected var _volume:Number;
-		protected var pauseTime:Number;
+		protected var _masterVolume:Number;
 		protected var _position:int;
+		protected var pauseTime:Number;
+		
+		protected var soundTransform:SoundTransform;
+		internal var currentTween:SoundTween;
 		
 		public function SoundInstance(sound:Sound = null){
-			pauseTime = 0;
-			_volume = 1;
-			
 			this.sound = sound;
+			pauseTime = 0;
+			_volume = 1;			
+			_masterVolume = 1;
 			
 			soundCompleted = new Signal(SoundInstance);
 			soundTransform = new SoundTransform();
@@ -68,11 +72,10 @@ package treefortress.sound
 		 * @param loops Number of times to loop Sound. Pass -1 to loop forever.
 		 * @param allowMultiple Allow multiple concurrent instances of this Sound
 		 */
-		public function play(volume:Number = 1, startTime:int = -1, loops:int = 0, allowMultiple:Boolean = true):SoundInstance {
+		public function play(volume:Number = 1, startTime:int = 0, loops:int = 0, allowMultiple:Boolean = true):SoundInstance {
 			
 			this.loops = loops;
 			this.allowMultiple = allowMultiple;
-			
 			if(allowMultiple){
 				channel = sound.play(startTime, loops);
 			} else {
@@ -131,7 +134,7 @@ package treefortress.sound
 		 * Fade using the current volume as the Start Volume
 		 */
 		public function fadeTo(endVolume:Number, duration:Number = 1000):SoundInstance {
-			SoundAS.addTween(type, -1, endVolume, duration);
+			currentTween = SoundAS.addTween(type, -1, endVolume, duration);
 			return this;
 		}
 		
@@ -139,7 +142,7 @@ package treefortress.sound
 		 * Fade and specify both the Start Volume and End Volume.
 		 */
 		public function fadeFrom(startVolume:Number, endVolume:Number, duration:Number = 1000):SoundInstance {
-			SoundAS.addTween(type, startVolume, endVolume, duration);
+			currentTween = SoundAS.addTween(type, startVolume, endVolume, duration);
 			return this;
 		}
 		
@@ -159,25 +162,40 @@ package treefortress.sound
 				stopChannel(channel);
 			}
 			channel = sound.play(value, loops);
+			channel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
 		}
 		
 
 		/**
-		 * Adjust volume for this sound. You can call this while muted to change volume, and it will not break the mute.
+		 * Value between 0 and 1. You can call this while muted to change volume, and it will not break the mute.
 		 */
 		public function get volume():Number { return _volume; }
 		public function set volume(value:Number):void {
+			//Update the voume value, but respect the mute flag.
+			if(value < 0){ value = 0; } else if(value > 1 || isNaN(volume)){ value = 1; }
 			_volume = value;
 			if(_muted){ return; }
 			
-			if(value < 0){ value = 0; } else if(value > 1){ value = 1; }
+			//Update actual sound volume
 			if(!soundTransform){ soundTransform = new SoundTransform(); }
-			soundTransform.volume = value;
+			soundTransform.volume = _volume * _masterVolume;
 			if(channel){
 				channel.soundTransform = soundTransform;
 			}
 		}
 		
+		/**
+		 * Sets the master volume, which is multiplied with the current Volume level
+		 */
+		public function get masterVolume():Number { return _masterVolume; }
+		public function set masterVolume(value:Number):void {
+			if(_masterVolume == value){ return; }
+			//Update the voume value, but respect the mute flag.
+			if(value < 0){ value = 0; } else if(value > 1){ value = 1; }
+			_masterVolume = value;
+			//Call caller setter to update the volume
+			volume = _volume;
+		}
 		/**
 		 * Create a duplicate of this SoundInstance
 		 */
@@ -206,13 +224,27 @@ package treefortress.sound
 				sound.close();
 			} catch(e:Error){}
 			sound = null;
-			channel = null;
 			soundTransform = null;
+			stopChannel(channel);
+			endFade();
+		}
+		
+		/**
+		 * Ends the current tween for this sound if it has one.
+		 */
+		public function endFade(applyEndVolume:Boolean = false):SoundInstance {
+			if(!currentTween){ return this; }
+			currentTween.end(applyEndVolume);
+			currentTween = null;
+			return this;
 		}
 		
 		protected function stopChannel(channel:SoundChannel):void {
-			channel.stop(); 
+			if(!channel){ return; }
 			channel.removeEventListener(Event.SOUND_COMPLETE, onSoundComplete);
+			try {
+				channel.stop(); 
+			} catch(e:Error){};
 		}		
 		
 	}

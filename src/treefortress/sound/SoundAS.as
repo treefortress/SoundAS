@@ -8,6 +8,8 @@ package treefortress.sound
 	import flash.media.SoundLoaderContext;
 	import flash.net.URLRequest;
 	import flash.utils.Dictionary;
+	import flash.utils.getTimer;
+	import flash.utils.setInterval;
 	
 	import org.osflash.signals.Signal;
 	
@@ -22,12 +24,13 @@ package treefortress.sound
 		protected static var ticker:Sprite;
 		protected static var _mute:Boolean;
 		protected static var _volume:Number;
+		protected static var _masterVolume:Number;
+		protected static var _masterTween:SoundTween;
 		
 		//Static Initialization
 		{
 			init();
 			ticker = new Sprite();
-			ticker.addEventListener(Event.ENTER_FRAME, onTick);
 		}
 		
 		
@@ -41,6 +44,7 @@ package treefortress.sound
 		 */
 		public static var loadFailed:Signal;
 		
+		
 		/**
 		 * Play audio by type. It must already be loaded into memory using the addSound() or loadSound() APIs. 
 		 * @param type
@@ -50,14 +54,14 @@ package treefortress.sound
 		 * @param allowMultiple Allow multiple, overlapping instances of this Sound (useful for SoundFX)
 		 * @param allowInterrupt If this sound is currently playing, interrupt it and start at the specified StartTime. Otherwise, just update the Volume.
 		 */
-		public static function play(type:String, volume:Number = 1, startTime:Number = -1, loops:int = 0, allowMultiple:Boolean = false, allowInterrupt:Boolean = true):SoundInstance {
+		public static function play(type:String, volume:Number = 1, startTime:Number = 0, loops:int = 0, allowMultiple:Boolean = false, allowInterrupt:Boolean = true):SoundInstance {
 			var si:SoundInstance = getSound(type);
 			
 			//Sound is playing, and we're not allowed to interrupt it. Just set volume.
 			if(!allowInterrupt && si.isPlaying){
 				si.volume = volume;
 			} 
-				//Play sound
+			//Play sound
 			else {
 				si.play(volume, startTime, loops, allowMultiple);
 			}
@@ -113,6 +117,13 @@ package treefortress.sound
 		}
 		
 		/** 
+		 * Fade master volume starting at the current value
+		 **/
+		public static function fadeMasterTo(endVolume:Number = 1, duration:Number = 1000):void {
+			addMasterTween(_masterVolume, endVolume, duration);
+		}
+		
+		/** 
 		 * Fade specific sound starting at the current volume
 		 **/
 		public static function fadeTo(type:String, endVolume:Number = 1, duration:Number = 1000):SoundInstance {
@@ -142,6 +153,13 @@ package treefortress.sound
 			for(var i:int = 0, l:int = instances.length; i < l; i++){
 				instances[i].fadeFrom(startVolume, endVolume, duration);
 			}
+		}
+		
+		/** 
+		 * Fade master volume specifying both the StartVolume and EndVolume.
+		 **/
+		public static function fadeMasterFrom(endVolume:Number = 1, duration:Number = 1000):void {
+			addMasterTween(_masterVolume, endVolume, duration);
 		}
 		
 		/**
@@ -186,7 +204,11 @@ package treefortress.sound
 		 * 
 		 */
 		public static function loadSound(url:String, type:String, buffer:int = 100):void {
-			var si:SoundInstance = new SoundInstance();
+			//Check whether this Sound is already loaded
+			var si:SoundInstance = instancesByType[type];
+			if(si && si.url == url){ return; }
+			
+			si = new SoundInstance();
 			si.type = type;
 			si.url = url; //Useful for looking in case of load error
 			si.sound = new Sound(new URLRequest(url), new SoundLoaderContext(buffer, false));
@@ -200,9 +222,17 @@ package treefortress.sound
 		 * Inject a sound that has already been loaded.
 		 */
 		public static function addSound(type:String, sound:Sound):void {
-			var si:SoundInstance = new SoundInstance();
-			si.type = type;
-			si.sound = sound;
+			var si:SoundInstance;
+			//If the type is already mapped, inject sound into the existing SoundInstance.
+			if(instancesByType[type]){
+				si = instancesByType[type];
+				si.sound = sound;
+			} 
+			//Create a new SoundInstance
+			else {
+				si = new SoundInstance(sound);	
+				si.type = type;
+			}
 			addInstance(si);
 		}
 		
@@ -210,12 +240,15 @@ package treefortress.sound
 		 * Remove a sound from memory.
 		 */
 		public static function removeSound(type:String):void {
+			if(instancesByType[type] == null){ return; }
 			for(var i:int = instances.length - 1; i >= 0; i--){
 				if(instances[i].type == type){
+					instancesBySound[instances[i].sound] = null;
 					instances[i].destroy();
 					instances.splice(i, 1);
 				}
 			}
+			instancesByType[type] = null;
 		}
 		
 		/**
@@ -229,6 +262,17 @@ package treefortress.sound
 		}
 		
 		/**
+		 * Set master volume, which will me multiplied on top of all existing volume levels.
+		 */
+		public static function get masterVolume():Number { return _masterVolume; }
+		public static function set masterVolume(value:Number):void {
+			_masterVolume = value;
+			for(var i:int = instances.length - 1; i >= 0; i--){
+				instances[i].masterVolume = _masterVolume;
+			}
+		}
+		
+		/**
 		 * PRIVATE
 		 */
 		
@@ -238,38 +282,55 @@ package treefortress.sound
 			if(!loadFailed){ loadFailed = new Signal(SoundInstance); }
 			
 			//Init collections
+			_volume = 1;
+			_masterVolume = 1;
 			instances = new <SoundInstance>[];
 			instancesBySound = new Dictionary(true);
 			instancesByType = {};
 			activeTweens = new Vector.<SoundTween>();
 		}
 		
-		public static function addTween(type:String, startVolume:Number, endVolume:Number, duration:Number):void {
+		internal static function addMasterTween(startVolume:Number, endVolume:Number, duration:Number = 1000):void {
+			if(!_masterTween){ _masterTween = new SoundTween(null, 0, 0, true); }
+			
+			_masterTween.init(startVolume, endVolume, duration);
+			
+			if(activeTweens.indexOf(_masterTween) == -1){
+				activeTweens.push(_masterTween);
+			}
+			if(!ticker.hasEventListener(Event.ENTER_FRAME)){
+				ticker.addEventListener(Event.ENTER_FRAME, onTick);
+			}
+		}
+		
+		internal static function addTween(type:String, startVolume:Number, endVolume:Number, duration:Number):SoundTween {
 			var si:SoundInstance = getSound(type);
 			if(startVolume >= 0){ si.volume = startVolume; }
 			var tween:SoundTween = new SoundTween(si, endVolume, duration);
-			//Remove any active tweens for this Sound
-			for(var i:int = activeTweens.length - 1; i >= 0; i--){
-				if(activeTweens[i].sound == si){
-					activeTweens.splice(i, 1);
-				}
-			}
+			//Kill any active fade
+			si.endFade();
+			
+			//Add tween
 			activeTweens.push(tween);
+			if(!ticker.hasEventListener(Event.ENTER_FRAME)){
+				ticker.addEventListener(Event.ENTER_FRAME, onTick);
+			}
+			return tween;
 		}
 		
 		protected static function onTick(event:Event):void {
+			var t:int = getTimer();
 			for(var i:int = activeTweens.length - 1; i >= 0; i--){
-				if(activeTweens[i].update()){
+				if(activeTweens[i].update(t)){
 					activeTweens.splice(i, 1);
 				}
 			}
+			if(activeTweens.length == 0){ ticker.removeEventListener(Event.ENTER_FRAME, onTick); }
 		}
 		
 		protected static function addInstance(si:SoundInstance):void {
 			si.mute = _mute;
-			if(instances.indexOf(si) == -1){
-				instances.push(si);
-			}
+			if(instances.indexOf(si) == -1){ instances.push(si); }
 			instancesBySound[si.sound] = si;
 			instancesByType[si.type] = si;
 		}
@@ -285,6 +346,8 @@ package treefortress.sound
 			var sound:Sound = event.target as Sound;
 			loadFailed.dispatch(instancesBySound[sound]);
 		}
+
+
 		
 	}
 }
