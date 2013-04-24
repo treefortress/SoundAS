@@ -1,9 +1,9 @@
 [license]: https://github.com/treefortress/SoundAS/raw/master/license.txt
 
-SoundAS
-=======
+SoundAS - AS3 SoundManager
+==========================
 
-A modern lightweight sound manager for AS3. 
+A modern lightweight AS3 SoundManager for Flash and AIR. 
 
 The goal of SoundAS is to simplifying playback of your audio files, with a focus on easily transitioning from one to another, and differentiating between SoundFX and Music Loops.
 
@@ -12,6 +12,7 @@ The goal of SoundAS is to simplifying playback of your audio files, with a focus
 * Easy memory management
 * API Chaining: SoundAS.play("music").fadeTo(0);
 * Built-in Tweening system, no dependancies
+* Modular API. If all you need is a nice wrapper around the Sound object, use SoundInstance directly and ignore the rest.
 
 #API Overview
 
