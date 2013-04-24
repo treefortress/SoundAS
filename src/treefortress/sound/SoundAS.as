@@ -43,8 +43,6 @@ package treefortress.sound
 		 */
 		public static var loadFailed:Signal;
 		
-		
-		
 		/**
 		 * Play audio by type. It must already be loaded into memory using the addSound() or loadSound() APIs. 
 		 * @param type
@@ -80,6 +78,15 @@ package treefortress.sound
 		 */
 		public static function playFx(type:String, volume:Number = 1, startTime:Number = 0, loops:int = 0):SoundInstance {
 			return play(type, volume, startTime, 0, true);
+		}
+		
+		/**
+		 * Stop all sounds immediately.
+		 */
+		public static function stopAll():void {
+			for(var i:int = instances.length; i--;){
+				instances[i].stop();
+			}
 		}
 		
 		/**
@@ -333,8 +340,9 @@ package treefortress.sound
 		protected static function onSoundLoadProgress(event:ProgressEvent):void { }
 		
 		protected static function onSoundLoadError(event:IOErrorEvent):void {
-			var sound:Sound = event.target as Sound;
-			loadFailed.dispatch(instancesBySound[sound]);
+			var sound:SoundInstance = instancesBySound[event.target as Sound];
+			loadFailed.dispatch(sound);
+			trace("[SoundAS] ERROR: Failed Loading Sound '"+sound.type+"' @ "+sound.url);
 		}
 
 		protected static function get tickEnabled():Boolean { return _tickEnabled; }

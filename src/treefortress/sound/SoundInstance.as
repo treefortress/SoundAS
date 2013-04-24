@@ -45,6 +45,7 @@ package treefortress.sound
 		 */
 		public var allowMultiple:Boolean;
 		
+		protected var loopCount:int;
 		protected var _muted:Boolean;
 		protected var _volume:Number;
 		protected var _masterVolume:Number;
@@ -75,17 +76,19 @@ package treefortress.sound
 		public function play(volume:Number = 1, startTime:Number = 0, loops:int = 0, allowMultiple:Boolean = true):SoundInstance {
 			
 			this.loops = loops;
+			this.loopCount = loops;
 			this.allowMultiple = allowMultiple;
 			if(allowMultiple){
-				channel = sound.play(startTime, loops);
+				channel = sound.play(startTime, 0);
 			} else {
 				if(channel){ 
-					pauseTime = channel.position;
 					stopChannel(channel);
 				}
- 				channel = sound.play(startTime, loops == -1? 0 : loops);
+ 				channel = sound.play(startTime, 0);
 			}
 			channel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
+			
+			pauseTime = 0; //Always reset pause time on play
 			this.volume = volume;	
 			this.mute = mute;
 			return this;
@@ -97,16 +100,18 @@ package treefortress.sound
 		public function pause():SoundInstance {
 			if(!channel){ return this; }
 			pauseTime = channel.position;
-			channel.stop();
+			stopChannel(channel);
 			return this;
 		}
 
 		
 		/**
-		 * Resume from previously paused time, or start over if it's not playing.
+		 * Resume from previously paused time. Optionally start over if it's not paused.
 		 */
-		public function resume():SoundInstance {
-			play(_volume, pauseTime, loops, allowMultiple);
+		public function resume(forceStart:Boolean = true):SoundInstance {
+			if(isPaused || forceStart){
+				play(_volume, pauseTime, loops, allowMultiple);
+			} 
 			return this;
 		}
 		
@@ -115,7 +120,7 @@ package treefortress.sound
 		 */
 		public function stop():SoundInstance {
 			pauseTime = 0;
-			channel.stop();
+			stopChannel(channel);
 			return this;
 		}
 		
@@ -158,6 +163,13 @@ package treefortress.sound
 		 */
 		public function get mixedVolume():Number {
 			return _volume * _masterVolume;
+		}
+		
+		/**
+		 * Indicates whether this sound is currently paused.
+		 */
+		public function get isPaused():Boolean {
+			return pauseTime > 0;
 		}
 		
 		/**
@@ -213,16 +225,6 @@ package treefortress.sound
 		}
 		
 		/**
-		 * Dispatched when Sound has finished playback
-		 */
-		protected function onSoundComplete(event:Event):void {
-			soundCompleted.dispatch(this);
-			if(loops == -1 && (event.target as SoundChannel) == channel){
-				play(_volume, 0, -1, allowMultiple);
-			}
-		}
-		
-		/**
 		 * Unload sound from memory.
 		 */
 		public function destroy():void {
@@ -234,6 +236,21 @@ package treefortress.sound
 			soundTransform = null;
 			stopChannel(channel);
 			endFade();
+		}
+		
+		/**
+		 * Dispatched when Sound has finished playback
+		 */
+		protected function onSoundComplete(event:Event):void {
+			soundCompleted.dispatch(this);
+			//make sure it's not an old sound channel...
+			if((event.target as SoundChannel) != this.channel){ return; }
+			
+			if(loops == -1){
+				play(_volume, 0, -1, allowMultiple);
+			} else if(loopCount--){
+				play(_volume, 0, loopCount, allowMultiple);
+			}
 		}
 		
 		/**

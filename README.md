@@ -31,10 +31,10 @@ Loading / Unloading:
 Playback:
 
 *    **getSound**(type:String, forceNew:Boolean = false):SoundInstance
-*    **play**(type:String, volume:Number = 1, startTime:Number = -1, loops:int = 0, allowMultiple:Boolean = false, allowInterrupt:Boolean = true):SoundInstance
-*    **playFx**(type:String, volume:Number = 1, startTime:Number = -1, loops:int = 0):SoundInstance
-*    **playLoop**(type:String, volume:Number = 1, startTime:Number = -1):SoundInstance
-*    **resume**(type:String, volume:Number = 1, startTime:Number = -1, loops:int = 0):SoundInstance
+*    **play**(type:String, volume:Number = 1, startTime:Number = 0, loops:int = 0, allowMultiple:Boolean = false, allowInterrupt:Boolean = true):SoundInstance
+*    **playFx**(type:String, volume:Number = 1, startTime:Number = 0, loops:int = 0):SoundInstance
+*    **playLoop**(type:String, volume:Number = 1, startTime:Number = 0):SoundInstance
+*    **resume**(type:String, volume:Number = 1, startTime:Number = 0, loops:int = 0):SoundInstance
 *    **resumeAll**():void
 *    **pause**(type:String):SoundInstance
 *    **pauseAll**():void
@@ -49,7 +49,7 @@ Playback:
 ####SoundInstance
 Controls playback of individual sounds, allowing you to easily stop, start, resume and set volume or position.
 
-*     **play**(volume:Number = 1, startTime:int = -1, loops:int = 0, allowMultiple:Boolean = true):SoundInstance
+*     **play**(volume:Number = 1, startTime:Number = 0, loops:int = 0, allowMultiple:Boolean = true):SoundInstance
 *     **pause**():SoundInstance
 *     **resume**():SoundInstance
 *     **stop**():SoundInstance
@@ -81,13 +81,24 @@ Controls playback of individual sounds, allowing you to easily stop, start, resu
     SoundAS.playFx("click");
 
     //Shortcut for typical game music (loops forever, no multiple instances)
-    SoundAS.playLoop("click");
+    SoundAS.playLoop("music");
 
-    //Toggle Mute 
+    //Toggle Mute for all sounds
     SoundAS.mute = !SoundAS.mute;
+
+    //PauseAll / ResumeAll
+    SoundAS.pauseAll();
+    SoundAS.resumeAll();
+     
+    //Toggle Pause on individual song
+    var sound:SoundInstance = SoundAS.getSound("music");
+    (sound.isPaused)? sound.resume() : sound.pause();
 
     //Fade Out
     SoundAS.getSound("click").fadeTo(0);
+
+    //Fade masterVolume out
+    SoundAS.fadeMasterTo(0);
 
 ###Advanced 
 
@@ -97,8 +108,8 @@ Controls playback of individual sounds, allowing you to easily stop, start, resu
     //Fade from .3 to .7 over 3 seconds
     SoundAS.getSound("click").fadeFrom(.3, .7, 3000);
 
-	//Manage a SoundInstance directly
-    var sound:SoundInstance = SoundAS.getSound("click");
+	//Manage a SoundInstance directly and ignore SoundAS
+    var sound:SoundInstance = new SoundInstance(mySound, "click");
     sound.play(volume);
     sound.position = 500; //Set position of sound in milliseconds
     sound.volume = .5; 
