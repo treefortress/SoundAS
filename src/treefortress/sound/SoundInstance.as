@@ -16,7 +16,7 @@ package treefortress.sound
 		public var type:String;
 		
 		/**
-		 * URL this sound was loaded from. This is null if the sound was not loaded externally.
+		 * URL this sound was loaded from. This is null if the sound was not loaded by SoundAS
 		 */
 		public var url:String;
 		
@@ -45,7 +45,6 @@ package treefortress.sound
 		 */
 		public var allowMultiple:Boolean;
 		
-		
 		protected var _muted:Boolean;
 		protected var _volume:Number;
 		protected var _masterVolume:Number;
@@ -55,8 +54,9 @@ package treefortress.sound
 		protected var soundTransform:SoundTransform;
 		internal var currentTween:SoundTween;
 		
-		public function SoundInstance(sound:Sound = null){
+		public function SoundInstance(sound:Sound = null, type:String = null){
 			this.sound = sound;
+			this.type = type;
 			pauseTime = 0;
 			_volume = 1;			
 			_masterVolume = 1;
@@ -72,7 +72,7 @@ package treefortress.sound
 		 * @param loops Number of times to loop Sound. Pass -1 to loop forever.
 		 * @param allowMultiple Allow multiple concurrent instances of this Sound
 		 */
-		public function play(volume:Number = 1, startTime:int = 0, loops:int = 0, allowMultiple:Boolean = true):SoundInstance {
+		public function play(volume:Number = 1, startTime:Number = 0, loops:int = 0, allowMultiple:Boolean = true):SoundInstance {
 			
 			this.loops = loops;
 			this.allowMultiple = allowMultiple;
@@ -154,10 +154,17 @@ package treefortress.sound
 		}
 		
 		/**
+		 * Combined masterVolume and volume levels
+		 */
+		public function get mixedVolume():Number {
+			return _volume * _masterVolume;
+		}
+		
+		/**
 		 * Set position of sound in milliseconds
 		 */
-		public function get position():int { return channel? channel.position : 0; }
-		public function set position(value:int):void {
+		public function get position():Number { return channel? channel.position : 0; }
+		public function set position(value:Number):void {
 			if(channel){ 
 				stopChannel(channel);
 			}
@@ -165,7 +172,6 @@ package treefortress.sound
 			channel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
 		}
 		
-
 		/**
 		 * Value between 0 and 1. You can call this while muted to change volume, and it will not break the mute.
 		 */
@@ -178,7 +184,7 @@ package treefortress.sound
 			
 			//Update actual sound volume
 			if(!soundTransform){ soundTransform = new SoundTransform(); }
-			soundTransform.volume = _volume * _masterVolume;
+			soundTransform.volume = mixedVolume;
 			if(channel){
 				channel.soundTransform = soundTransform;
 			}
@@ -193,9 +199,11 @@ package treefortress.sound
 			//Update the voume value, but respect the mute flag.
 			if(value < 0){ value = 0; } else if(value > 1){ value = 1; }
 			_masterVolume = value;
-			//Call caller setter to update the volume
+			
+			//Call setter to update the volume
 			volume = _volume;
 		}
+		
 		/**
 		 * Create a duplicate of this SoundInstance
 		 */
@@ -203,7 +211,6 @@ package treefortress.sound
 			var si:SoundInstance = new SoundInstance(sound);
 			return si;
 		}
-
 		
 		/**
 		 * Dispatched when Sound has finished playback
@@ -239,6 +246,9 @@ package treefortress.sound
 			return this;
 		}
 		
+		/**
+		 * Stop the currently playing channel.
+		 */
 		protected function stopChannel(channel:SoundChannel):void {
 			if(!channel){ return; }
 			channel.removeEventListener(Event.SOUND_COMPLETE, onSoundComplete);

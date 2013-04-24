@@ -9,7 +9,6 @@ package treefortress.sound
 	import flash.net.URLRequest;
 	import flash.utils.Dictionary;
 	import flash.utils.getTimer;
-	import flash.utils.setInterval;
 	
 	import org.osflash.signals.Signal;
 	
@@ -22,6 +21,7 @@ package treefortress.sound
 		protected static var activeTweens:Vector.<SoundTween>;
 		
 		protected static var ticker:Sprite;
+		protected static var _tickEnabled:Boolean;
 		protected static var _mute:Boolean;
 		protected static var _volume:Number;
 		protected static var _masterVolume:Number;
@@ -30,7 +30,6 @@ package treefortress.sound
 		//Static Initialization
 		{
 			init();
-			ticker = new Sprite();
 		}
 		
 		
@@ -43,6 +42,7 @@ package treefortress.sound
 		 * Dispatched when an external Sound has failed loading. 
 		 */
 		public static var loadFailed:Signal;
+		
 		
 		
 		/**
@@ -70,17 +70,15 @@ package treefortress.sound
 		
 		/**
 		 * Convenience function to play a sound that should loop forever.
-		 * 
 		 */
-		public static function playLoop(type:String, volume:Number = 1, startTime:Number = -1):SoundInstance {
+		public static function playLoop(type:String, volume:Number = 1, startTime:Number = 0):SoundInstance {
 			return play(type, volume, startTime, -1, false);
 		}
 		
 		/**
 		 * Convenience function to play a sound that can have overlapping instances (ie click or soundFx).
-		 * 
 		 */
-		public static function playFx(type:String, volume:Number = 1, startTime:Number = -1, loops:int = 0):SoundInstance {
+		public static function playFx(type:String, volume:Number = 1, startTime:Number = 0, loops:int = 0):SoundInstance {
 			return play(type, volume, startTime, 0, true);
 		}
 		
@@ -95,7 +93,7 @@ package treefortress.sound
 		 * Resume all paused instances.
 		 */
 		public static function resumeAll():void {
-			for(var i:int = 0, l:int = instances.length; i < l; i++){
+			for(var i:int = instances.length; i--;){
 				instances[i].resume();
 			}
 		}
@@ -111,16 +109,9 @@ package treefortress.sound
 		 * Pause all sounds
 		 */
 		public static function pauseAll():void {
-			for(var i:int = 0, l:int = instances.length; i < l; i++){
+			for(var i:int = instances.length; i--;){
 				instances[i].pause();
 			}
-		}
-		
-		/** 
-		 * Fade master volume starting at the current value
-		 **/
-		public static function fadeMasterTo(endVolume:Number = 1, duration:Number = 1000):void {
-			addMasterTween(_masterVolume, endVolume, duration);
 		}
 		
 		/** 
@@ -134,9 +125,16 @@ package treefortress.sound
 		 * Fade all sounds starting from their current Volume
 		 */
 		public static function fadeAllTo(endVolume:Number = 1, duration:Number = 1000):void {
-			for(var i:int = 0, l:int = instances.length; i < l; i++){
+			for(var i:int = instances.length; i--;){
 				instances[i].fadeTo(endVolume, duration);
 			}
+		}
+		
+		/** 
+		 * Fade master volume starting at the current value
+		 **/
+		public static function fadeMasterTo(endVolume:Number = 1, duration:Number = 1000):void {
+			addMasterTween(_masterVolume, endVolume, duration);
 		}
 		
 		/** 
@@ -150,7 +148,7 @@ package treefortress.sound
 		 * Fade all sounds specifying both the StartVolume and EndVolume.
 		 */
 		public static function fadeAllFrom(startVolume:Number = 0, endVolume:Number = 1, duration:Number = 1000):void {
-			for(var i:int = 0, l:int = instances.length; i < l; i++){
+			for(var i:int = instances.length; i--;){
 				instances[i].fadeFrom(startVolume, endVolume, duration);
 			}
 		}
@@ -168,7 +166,7 @@ package treefortress.sound
 		public static function get mute():Boolean { return _mute; }
 		public static function set mute(value:Boolean):void {
 			_mute = value;
-			for(var i:int = 0, l:int = instances.length; i < l; i++){
+			for(var i:int = instances.length; i--;){
 				instances[i].mute = _mute;
 			}
 		}
@@ -179,7 +177,7 @@ package treefortress.sound
 		public static function get volume():Number { return _volume; }
 		public static function set volume(value:Number):void {
 			_volume = value;
-			for(var i:int = 0, l:int = instances.length; i < l; i++){
+			for(var i:int = instances.length; i--;){
 				instances[i].volume = _volume;
 			}
 		}
@@ -208,8 +206,7 @@ package treefortress.sound
 			var si:SoundInstance = instancesByType[type];
 			if(si && si.url == url){ return; }
 			
-			si = new SoundInstance();
-			si.type = type;
+			si = new SoundInstance(null, type);
 			si.url = url; //Useful for looking in case of load error
 			si.sound = new Sound(new URLRequest(url), new SoundLoaderContext(buffer, false));
 			si.sound.addEventListener(IOErrorEvent.IO_ERROR, onSoundLoadError, false, 0, true);
@@ -230,8 +227,7 @@ package treefortress.sound
 			} 
 			//Create a new SoundInstance
 			else {
-				si = new SoundInstance(sound);	
-				si.type = type;
+				si = new SoundInstance(sound, type);
 			}
 			addInstance(si);
 		}
@@ -241,7 +237,7 @@ package treefortress.sound
 		 */
 		public static function removeSound(type:String):void {
 			if(instancesByType[type] == null){ return; }
-			for(var i:int = instances.length - 1; i >= 0; i--){
+			for(var i:int = instances.length; i--;){
 				if(instances[i].type == type){
 					instancesBySound[instances[i].sound] = null;
 					instances[i].destroy();
@@ -255,7 +251,7 @@ package treefortress.sound
 		 * Unload all Sound instances.
 		 */
 		public static function removeAll():void {
-			for(var i:int = 0; i < instances.length; i++){
+			for(var i:int = instances.length; i--;){
 				instances[i].destroy();
 			}
 			init();
@@ -267,7 +263,7 @@ package treefortress.sound
 		public static function get masterVolume():Number { return _masterVolume; }
 		public static function set masterVolume(value:Number):void {
 			_masterVolume = value;
-			for(var i:int = instances.length - 1; i >= 0; i--){
+			for(var i:int = instances.length; i--;){
 				instances[i].masterVolume = _masterVolume;
 			}
 		}
@@ -275,7 +271,6 @@ package treefortress.sound
 		/**
 		 * PRIVATE
 		 */
-		
 		protected static function init():void {
 			//Create external signals
 			if(!loadCompleted){ loadCompleted = new Signal(SoundInstance); }
@@ -292,40 +287,35 @@ package treefortress.sound
 		
 		internal static function addMasterTween(startVolume:Number, endVolume:Number, duration:Number = 1000):void {
 			if(!_masterTween){ _masterTween = new SoundTween(null, 0, 0, true); }
-			
 			_masterTween.init(startVolume, endVolume, duration);
-			
+			//Only add masterTween if it isn't already active.
 			if(activeTweens.indexOf(_masterTween) == -1){
 				activeTweens.push(_masterTween);
 			}
-			if(!ticker.hasEventListener(Event.ENTER_FRAME)){
-				ticker.addEventListener(Event.ENTER_FRAME, onTick);
-			}
+			tickEnabled = true;
 		}
 		
 		internal static function addTween(type:String, startVolume:Number, endVolume:Number, duration:Number):SoundTween {
 			var si:SoundInstance = getSound(type);
 			if(startVolume >= 0){ si.volume = startVolume; }
 			var tween:SoundTween = new SoundTween(si, endVolume, duration);
-			//Kill any active fade
+			//Kill any active tween, it will get removed the next time the tweens are updated.
 			si.endFade();
-			
-			//Add tween
+			//Add new tween
 			activeTweens.push(tween);
-			if(!ticker.hasEventListener(Event.ENTER_FRAME)){
-				ticker.addEventListener(Event.ENTER_FRAME, onTick);
-			}
+			
+			tickEnabled = true;
 			return tween;
 		}
 		
 		protected static function onTick(event:Event):void {
 			var t:int = getTimer();
-			for(var i:int = activeTweens.length - 1; i >= 0; i--){
+			for(var i:int = activeTweens.length; i--;){
 				if(activeTweens[i].update(t)){
 					activeTweens.splice(i, 1);
 				}
 			}
-			if(activeTweens.length == 0){ ticker.removeEventListener(Event.ENTER_FRAME, onTick); }
+			tickEnabled = (activeTweens.length > 0);
 		}
 		
 		protected static function addInstance(si:SoundInstance):void {
@@ -347,8 +337,17 @@ package treefortress.sound
 			loadFailed.dispatch(instancesBySound[sound]);
 		}
 
-
-		
+		protected static function get tickEnabled():Boolean { return _tickEnabled; }
+		protected static function set tickEnabled(value:Boolean):void {
+			if(value == _tickEnabled){ return; }
+			_tickEnabled = value;
+			if(_tickEnabled){
+				if(!ticker){ ticker = new Sprite(); }
+				ticker.addEventListener(Event.ENTER_FRAME, onTick);
+			} else {
+				ticker.removeEventListener(Event.ENTER_FRAME, onTick); 
+			}
+		}
 	}
 }
 
