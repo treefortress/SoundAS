@@ -116,6 +116,19 @@ Controls playback of individual sounds, allowing you to easily stop, start, resu
     sound.volume = .5; 
 	sound.fadeTo(0);
 
+    //String 2 songs together
+    SoundAS.play(MUSIC1).soundCompleted.addOnce(function(si:SoundInstance){
+        SoundAS.playLoop(MUSIC2);
+    }
+
+    //Loop twice, and trigger something when all loops are finished.
+    SoundAS.play(MUSIC1, 1, 0, 2).soundCompleted.add(function(si:SoundInstance){
+        if(si.loopsRemaining == -1){
+            trace("Loops completed!");
+            si.soundCompleted.removeAll();
+        }
+    }
+
 ---
 ### License
 [WTFPL][license]

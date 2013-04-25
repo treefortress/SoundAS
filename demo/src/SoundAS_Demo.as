@@ -3,7 +3,9 @@ package
 	import flash.display.Sprite;
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
+	import flash.media.Sound;
 	import flash.ui.Keyboard;
+	import flash.utils.getTimer;
 	import flash.utils.setTimeout;
 	
 	import treefortress.sound.SoundAS;
@@ -22,6 +24,11 @@ package
 			SoundAS.loadSound("Music.mp3", MUSIC);
 			SoundAS.loadSound("Solo1.mp3", SOLO1);
 			SoundAS.loadSound("Solo2.mp3", SOLO2);
+			
+			stage.addEventListener(MouseEvent.CLICK, function(){
+				var click:SoundInstance = SoundAS.playFx(CLICK);
+				trace("Click.oldChannels.length = " + click.oldChannels.length);
+			});
 			
 			stage.addEventListener(KeyboardEvent.KEY_UP, function(event:KeyboardEvent){
 				var volume:Number = 1;
@@ -146,31 +153,36 @@ package
 					
 					case Keyboard.NUMBER_5:
 						trace("LOOPING: Loop solo 2 times, pause halfway each time. Shows workaround for the 'loop bug': http://www.stevensacks.net/2008/08/07/as3-sound-channel-bug/ ");
-						var si:SoundInstance = SoundAS.play(SOLO1, volume, 0, 2);
-						si.soundCompleted.add(playPause);
-						playPause(si);
+						var solo:SoundInstance = SoundAS.play(SOLO1, volume, 0, 2);
+						solo.soundCompleted.add(playPause);
+						playPause(solo);
 						function playPause(si:SoundInstance):void {
-							if(si.loopsRemaining == -1){ 
-								SoundAS.playLoop(CLICK);
+							if(solo.loopsRemaining == -1){ 
 								trace("INFINITE LOOP: 5 seconds of repeating Clicks");
+								var startTime:int = getTimer();
+								var click:SoundInstance = SoundAS.playLoop(CLICK);
+								click.soundCompleted.add(function(si:SoundInstance){
+									trace("soundComplete");
+									//Stop after 5 seconds
+									if(getTimer() - startTime > 5000){
+										click.stop();
+										click.soundCompleted.removeAll();
+										solo.soundCompleted.removeAll();
+									}
+								});
+							} 
+							else {
 								setTimeout(function(){
-									SoundAS.getSound(CLICK).stop();
-									si.soundCompleted.removeAll();
-								}, 5000);
-							} else {
-								setTimeout(function(){
-									si.pause();
+									solo.pause();
 									trace("pause");
 								}, 500);
 								setTimeout(function(){
-									si.resume();
+									solo.resume();
 									trace("resume");
 								}, 1000);
 							}
 						}
 						break;
-					
-					
 				}
 				
 			});

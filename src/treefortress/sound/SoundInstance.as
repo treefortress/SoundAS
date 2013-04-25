@@ -57,7 +57,6 @@ package treefortress.sound
 		protected var _position:int;
 		protected var pauseTime:Number;
 		
-		
 		protected var soundTransform:SoundTransform;
 		internal var currentTween:SoundTween;
 		
@@ -80,9 +79,9 @@ package treefortress.sound
 		 * @param allowMultiple Allow multiple concurrent instances of this Sound
 		 */
 		public function play(volume:Number = 1, startTime:Number = 0, loops:int = 0, allowMultiple:Boolean = true):SoundInstance {
-			
 			this.loops = loops;
-			this._loopsRemaining = loops;
+			//If it's an infinite loop, set loopsRemaining to 0
+			this._loopsRemaining = loops == -1? 0 : loops;
 			this.allowMultiple = allowMultiple;
 			if(allowMultiple){
 				//Store old channel, so we can still stop it if requested.
@@ -221,10 +220,8 @@ package treefortress.sound
 		public function get masterVolume():Number { return _masterVolume; }
 		public function set masterVolume(value:Number):void {
 			if(_masterVolume == value){ return; }
-			//Update the voume value, but respect the mute flag.
 			if(value < 0){ value = 0; } else if(value > 1){ value = 1; }
 			_masterVolume = value;
-			
 			//Call setter to update the volume
 			volume = _volume;
 		}
@@ -255,9 +252,11 @@ package treefortress.sound
 		 * Dispatched when Sound has finished playback
 		 */
 		protected function onSoundComplete(event:Event):void {
+			//trace("stop", ++stopCount);
 			var channel:SoundChannel = event.target as SoundChannel;
 			//If it's the current channel, see if we should loop.
 			if(channel == this.channel){ 
+				soundCompleted.dispatch(this);
 				//loop forever?
 				if(loops == -1){ 
 					play(_volume, 0, -1, allowMultiple);
@@ -266,14 +265,14 @@ package treefortress.sound
 				else if(_loopsRemaining--){
 					play(_volume, 0, _loopsRemaining, allowMultiple);
 				}
-				soundCompleted.dispatch(this);
 			}
-			//Not the current channel, must be old. Get rid of it...
-			else {
-				var index:int = oldChannels.indexOf(channel);
-				if(index != -1){ oldChannels.splice(index, 1); }
-				stopChannel(channel);
-			}	
+			//Clear out any old channels...
+			for(var i:int = oldChannels.length; i--;){
+				if(channel.position == sound.length){
+					stopChannel(channel);
+					oldChannels.splice(i, 1);
+				}
+			}
 		}
 		
 		/**
@@ -287,6 +286,14 @@ package treefortress.sound
 		}
 		
 		/**
+		 * Loops remaining, this will auto-decrement each time the sound loops. It will equal -1 when the sound is completed. 
+		 * It will equal 0 if the sound is looping infinitely, or not looping at all.
+		 */
+		public function get loopsRemaining():int {
+			return _loopsRemaining;
+		}
+		
+		/**
 		 * Stop the currently playing channel.
 		 */
 		protected function stopChannel(channel:SoundChannel):void {
@@ -297,7 +304,9 @@ package treefortress.sound
 			} catch(e:Error){};
 		}		
 		
-		//Kill all orphaned channels
+		/**
+		 * Kill all orphaned channels
+		 */
 		protected function stopOldChannels():void {
 			if(!oldChannels.length){ return; }
 			for(var i:int = oldChannels.length; i--;){
@@ -306,16 +315,16 @@ package treefortress.sound
 			oldChannels.length = 0;
 		}
 		
+		/**
+		 * Keep orphaned channels in sync with current volume
+		 */
 		protected function updateOldChannels():void {
 			if(!channel){ return; }
 			for(var i:int = oldChannels.length; i--;){
-				oldChannels[i].soundTransform = new SoundTransform(channel.soundTransform.volume);
-			}
+				oldChannels[i].soundTransform = channel.soundTransform;			}
 		}
 
-		public function get loopsRemaining():int {
-			return _loopsRemaining;
-		}
+	
 
 	}
 }
