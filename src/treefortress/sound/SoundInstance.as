@@ -6,7 +6,7 @@ package treefortress.sound
 	import flash.media.SoundTransform;
 	
 	import org.osflash.signals.Signal;
-
+	
 	public class SoundInstance {
 		
 		
@@ -45,12 +45,18 @@ package treefortress.sound
 		 */
 		public var allowMultiple:Boolean;
 		
-		protected var loopCount:int;
+		/**
+		 * Orphaned channels that are in the process of playing out. These will only exist when: allowMultiple = true
+		 */
+		public var oldChannels:Vector.<SoundChannel>;
+		
+		protected var _loopsRemaining:int;
 		protected var _muted:Boolean;
 		protected var _volume:Number;
 		protected var _masterVolume:Number;
 		protected var _position:int;
 		protected var pauseTime:Number;
+		
 		
 		protected var soundTransform:SoundTransform;
 		internal var currentTween:SoundTween;
@@ -60,10 +66,10 @@ package treefortress.sound
 			this.type = type;
 			pauseTime = 0;
 			_volume = 1;			
-			_masterVolume = 1;
-			
+			_masterVolume = 1
 			soundCompleted = new Signal(SoundInstance);
 			soundTransform = new SoundTransform();
+			oldChannels = new <SoundChannel>[];
 		}
 		
 		/**
@@ -76,15 +82,19 @@ package treefortress.sound
 		public function play(volume:Number = 1, startTime:Number = 0, loops:int = 0, allowMultiple:Boolean = true):SoundInstance {
 			
 			this.loops = loops;
-			this.loopCount = loops;
+			this._loopsRemaining = loops;
 			this.allowMultiple = allowMultiple;
 			if(allowMultiple){
+				//Store old channel, so we can still stop it if requested.
+				if(channel){
+					oldChannels.push(channel);
+				}
 				channel = sound.play(startTime, 0);
 			} else {
 				if(channel){ 
 					stopChannel(channel);
 				}
- 				channel = sound.play(startTime, 0);
+				channel = sound.play(startTime, 0);
 			}
 			channel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
 			
@@ -95,20 +105,20 @@ package treefortress.sound
 		}
 		
 		/**
-		 * Pause currently playing sound. Use resume() to continue playback.
+		 * Pause currently playing sound. Use resume() to continue playback. Pause / resume is supported for single sounds only.
 		 */
 		public function pause():SoundInstance {
 			if(!channel){ return this; }
 			pauseTime = channel.position;
 			stopChannel(channel);
+			stopOldChannels();
 			return this;
 		}
-
 		
 		/**
 		 * Resume from previously paused time. Optionally start over if it's not paused.
 		 */
-		public function resume(forceStart:Boolean = true):SoundInstance {
+		public function resume(forceStart:Boolean = false):SoundInstance {
 			if(isPaused || forceStart){
 				play(_volume, pauseTime, loops, allowMultiple);
 			} 
@@ -121,6 +131,7 @@ package treefortress.sound
 		public function stop():SoundInstance {
 			pauseTime = 0;
 			stopChannel(channel);
+			stopOldChannels();
 			return this;
 		}
 		
@@ -132,6 +143,7 @@ package treefortress.sound
 			_muted = value;
 			if(channel){
 				channel.soundTransform = _muted? new SoundTransform(0) : soundTransform;
+				updateOldChannels();
 			}
 		}
 		
@@ -199,6 +211,7 @@ package treefortress.sound
 			soundTransform.volume = mixedVolume;
 			if(channel){
 				channel.soundTransform = soundTransform;
+				updateOldChannels();
 			}
 		}
 		
@@ -242,15 +255,25 @@ package treefortress.sound
 		 * Dispatched when Sound has finished playback
 		 */
 		protected function onSoundComplete(event:Event):void {
-			soundCompleted.dispatch(this);
-			//make sure it's not an old sound channel...
-			if((event.target as SoundChannel) != this.channel){ return; }
-			
-			if(loops == -1){
-				play(_volume, 0, -1, allowMultiple);
-			} else if(loopCount--){
-				play(_volume, 0, loopCount, allowMultiple);
+			var channel:SoundChannel = event.target as SoundChannel;
+			//If it's the current channel, see if we should loop.
+			if(channel == this.channel){ 
+				//loop forever?
+				if(loops == -1){ 
+					play(_volume, 0, -1, allowMultiple);
+				} 
+				//Loop set number of times?
+				else if(_loopsRemaining--){
+					play(_volume, 0, _loopsRemaining, allowMultiple);
+				}
+				soundCompleted.dispatch(this);
 			}
+			//Not the current channel, must be old. Get rid of it...
+			else {
+				var index:int = oldChannels.indexOf(channel);
+				if(index != -1){ oldChannels.splice(index, 1); }
+				stopChannel(channel);
+			}	
 		}
 		
 		/**
@@ -274,5 +297,26 @@ package treefortress.sound
 			} catch(e:Error){};
 		}		
 		
+		//Kill all orphaned channels
+		protected function stopOldChannels():void {
+			if(!oldChannels.length){ return; }
+			for(var i:int = oldChannels.length; i--;){
+				stopChannel(oldChannels[i]);
+			}
+			oldChannels.length = 0;
+		}
+		
+		protected function updateOldChannels():void {
+			if(!channel){ return; }
+			for(var i:int = oldChannels.length; i--;){
+				oldChannels[i].soundTransform = new SoundTransform(channel.soundTransform.volume);
+			}
+		}
+
+		public function get loopsRemaining():int {
+			return _loopsRemaining;
+		}
+
 	}
 }
+

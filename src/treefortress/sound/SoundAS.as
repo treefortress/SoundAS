@@ -12,7 +12,7 @@ package treefortress.sound
 	
 	import org.osflash.signals.Signal;
 	
-
+	
 	public class SoundAS
 	{
 		protected static var instances:Vector.<SoundInstance>;
@@ -163,8 +163,8 @@ package treefortress.sound
 		/** 
 		 * Fade master volume specifying both the StartVolume and EndVolume.
 		 **/
-		public static function fadeMasterFrom(endVolume:Number = 1, duration:Number = 1000):void {
-			addMasterTween(_masterVolume, endVolume, duration);
+		public static function fadeMasterFrom(startVolume:Number = 0, endVolume:Number = 1, duration:Number = 1000):void {
+			addMasterTween(startVolume, endVolume, duration);
 		}
 		
 		/**
@@ -232,7 +232,7 @@ package treefortress.sound
 				si = instancesByType[type];
 				si.sound = sound;
 			} 
-			//Create a new SoundInstance
+				//Create a new SoundInstance
 			else {
 				si = new SoundInstance(sound, type);
 			}
@@ -295,6 +295,7 @@ package treefortress.sound
 		internal static function addMasterTween(startVolume:Number, endVolume:Number, duration:Number = 1000):void {
 			if(!_masterTween){ _masterTween = new SoundTween(null, 0, 0, true); }
 			_masterTween.init(startVolume, endVolume, duration);
+			_masterTween.update(0);
 			//Only add masterTween if it isn't already active.
 			if(activeTweens.indexOf(_masterTween) == -1){
 				activeTweens.push(_masterTween);
@@ -306,6 +307,7 @@ package treefortress.sound
 			var si:SoundInstance = getSound(type);
 			if(startVolume >= 0){ si.volume = startVolume; }
 			var tween:SoundTween = new SoundTween(si, endVolume, duration);
+			tween.update(0);
 			//Kill any active tween, it will get removed the next time the tweens are updated.
 			si.endFade();
 			//Add new tween
@@ -344,7 +346,7 @@ package treefortress.sound
 			loadFailed.dispatch(sound);
 			trace("[SoundAS] ERROR: Failed Loading Sound '"+sound.type+"' @ "+sound.url);
 		}
-
+		
 		protected static function get tickEnabled():Boolean { return _tickEnabled; }
 		protected static function set tickEnabled(value:Boolean):void {
 			if(value == _tickEnabled){ return; }
@@ -358,4 +360,5 @@ package treefortress.sound
 		}
 	}
 }
+
 
