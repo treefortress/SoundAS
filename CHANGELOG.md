@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+####April 24, 2013
+* Added Test Suite
+* Added better support for orphaned channels. 
+* Added fix for obscure Sound bug with pausing a looping sound. 
+* Added instance.isPaused
+* Added instance.loopsRemaining
+* Added instance.mixedVolume
+* Added SoundAS.stopAll()
+* Misc bug fixes
+
 ####April 23, 2013
 * New APIs: fadeMasterTo, fadeMasterFrom, set masterVolume, instance.endFade, tween.end
 * Added "Master" volume control

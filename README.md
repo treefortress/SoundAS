@@ -38,6 +38,7 @@ Playback:
 *    **resumeAll**():void
 *    **pause**(type:String):SoundInstance
 *    **pauseAll**():void
+*    **stopAll**():void
 *    **set masterVolume**(value:Number):void
 *    **fadeFrom**(type:String, startVolume:Number = 0, endVolume:Number = 1, duration:Number = 1000)    
 *    **fadeAllFrom**(startVolume:Number = 0, endVolume:Number = 1, duration:Number = 1000)
@@ -51,7 +52,7 @@ Controls playback of individual sounds, allowing you to easily stop, start, resu
 
 *     **play**(volume:Number = 1, startTime:Number = 0, loops:int = 0, allowMultiple:Boolean = true):SoundInstance
 *     **pause**():SoundInstance
-*     **resume**():SoundInstance
+*     **resume**(forceStart:Boolean = false):SoundInstance
 *     **stop**():SoundInstance
 *     **set volume**(value:Number):void
 *     **set mute**(value:Boolean):void
