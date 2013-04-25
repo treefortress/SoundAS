@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>SoundAS_Demo</name>
+	<name>SoundAS</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -10,21 +10,16 @@
 			<arguments>
 			</arguments>
 		</buildCommand>
-		<buildCommand>
-			<name>com.adobe.flexbuilder.project.apollobuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
 	</buildSpec>
 	<natures>
-		<nature>com.adobe.flexbuilder.project.apollonature</nature>
+		<nature>com.adobe.flexbuilder.project.aslibnature</nature>
 		<nature>com.adobe.flexbuilder.project.actionscriptnature</nature>
 	</natures>
 	<linkedResources>
 		<link>
-			<name>[source path] src</name>
+			<name>bin-debug</name>
 			<type>2</type>
-			<location>F:/development/_libs/SoundAS/lib/src</location>
+			<location>F:/development/_libs/SoundAS/bin</location>
 		</link>
 	</linkedResources>
 </projectDescription>
