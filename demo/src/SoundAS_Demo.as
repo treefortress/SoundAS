@@ -10,6 +10,7 @@ package
 	
 	import treefortress.sound.SoundAS;
 	import treefortress.sound.SoundInstance;
+	import treefortress.sound.SoundManager;
 	
 	public class SoundAS_Demo extends Sprite
 	{
@@ -201,8 +202,62 @@ package
 						break;
 					
 					case Keyboard.NUMBER_6:
-						trace("GROUPS: Play groups: music and solos. Pause solos. Resume solos. FadeOut music, FadeIn music. Set volume music. Mute solos. unMute solos. ");
+						trace("GROUPS: MUSIC and SOLOS. Pause solos. Resume solos. FadeOut music, FadeIn music. Set volume music. Mute solos. unMute solos. ");
 						
+						var music:SoundManager = SoundAS.group("music");
+						var solos:SoundManager = SoundAS.group("solos");
+						
+						music.loadSound("Music.mp3", MUSIC);
+						
+						solos.loadSound("Solo1.mp3", SOLO1);
+						solos.loadSound("Solo2.mp3", SOLO2);
+						
+						music.playLoop(MUSIC);
+						
+						solos.playLoop(SOLO1);
+						solos.playLoop(SOLO2);
+						
+						setTimeout(function(){
+							trace("pause solos");
+							solos.pauseAll();
+						}, 1000);
+						
+						setTimeout(function(){
+							trace("resume solos");
+							solos.resumeAll();
+						}, 2000);
+						
+						setTimeout(function(){
+							trace("fadeOut Music");
+							music.fadeAllTo(0);
+						}, 2500);
+						
+						setTimeout(function(){
+							trace("fadeIn Music");
+							music.fadeAllTo(1, 350);
+						}, 4000);
+						
+						setTimeout(function(){
+							trace("Music Volume = .2");
+							music.volume = .2;
+						}, 5000);
+						
+						setTimeout(function(){
+							trace("Mute Solos");
+							solos.mute = true;
+						}, 6000);
+						
+						setTimeout(function(){
+							trace("Unmute Solos");
+							solos.mute = false;
+						}, 7000);
+						
+						setTimeout(function(){
+							trace("STOP ALL!");
+							for(var i:int = SoundAS.groups.length; i--;){
+								SoundAS.groups[i].stopAll();
+							}
+						}, 9000);
 				}
 				
 			});

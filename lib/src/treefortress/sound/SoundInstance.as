@@ -10,6 +10,8 @@ package treefortress.sound
 	public class SoundInstance {
 		
 		
+		public var group:SoundManager;
+		
 		/**
 		 * Registered type for this Sound
 		 */
@@ -63,6 +65,8 @@ package treefortress.sound
 		public function SoundInstance(sound:Sound = null, type:String = null){
 			this.sound = sound;
 			this.type = type;
+			group = SoundAS;
+			
 			pauseTime = 0;
 			_volume = 1;			
 			_masterVolume = 1
@@ -150,7 +154,7 @@ package treefortress.sound
 		 * Fade using the current volume as the Start Volume
 		 */
 		public function fadeTo(endVolume:Number, duration:Number = 1000):SoundInstance {
-			currentTween = SoundAS.addTween(type, -1, endVolume, duration);
+			currentTween = group.addTween(type, -1, endVolume, duration);
 			return this;
 		}
 		
@@ -158,7 +162,7 @@ package treefortress.sound
 		 * Fade and specify both the Start Volume and End Volume.
 		 */
 		public function fadeFrom(startVolume:Number, endVolume:Number, duration:Number = 1000):SoundInstance {
-			currentTween = SoundAS.addTween(type, startVolume, endVolume, duration);
+			currentTween = group.addTween(type, startVolume, endVolume, duration);
 			return this;
 		}
 		

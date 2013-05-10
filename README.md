@@ -11,6 +11,7 @@ The goal of SoundAS is to simplifying playback of your audio files, with a focus
 * Clean modern API
 * Easy memory management
 * API Chaining: SoundAS.play("music").fadeTo(0);
+* Supports groups of sounds
 * Built-in Tweening system, no dependancies
 * Modular API. If all you need is a nice wrapper around the Sound object, use SoundInstance directly and ignore the rest.
 * Non-restrictive and unambigous license
@@ -101,6 +102,22 @@ Controls playback of individual sounds, allowing you to easily stop, start, resu
 
     //Fade masterVolume out
     SoundAS.fadeMasterTo(0);
+
+### Groups
+
+    //Create a group
+    var musicGroup:SoundManager = SoundAS.group("music");
+
+    //Add sound(s) to group
+    musicGroup.loadSound("assets/TitleMusic.mp3", "titleMusic");
+    musicGroup.loadSound("assets/GameMusic.mp3", "gameMusic");
+
+    //Use entire SoundAS API on Group:
+    musicGroup.play("titleMusic")
+    musicGroup.volume = .5;
+    musicGroup.mute = muteMusic;
+    musicGroup.fadeTo(0);
+    //etc...
 
 ###Advanced 
 
