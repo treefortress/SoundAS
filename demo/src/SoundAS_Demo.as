@@ -21,9 +21,9 @@ package
 		public function SoundAS_Demo(){
 			
 			SoundAS.loadSound("Click.mp3", CLICK);
-			SoundAS.loadSound("Music.mp3", MUSIC);
-			SoundAS.loadSound("Solo1.mp3", SOLO1);
-			SoundAS.loadSound("Solo2.mp3", SOLO2);
+			SoundAS.loadSound("Music.mp3", MUSIC, 100, "music");
+			SoundAS.loadSound("Solo1.mp3", SOLO1, 100, "solos");
+			SoundAS.loadSound("Solo2.mp3", SOLO2, 100, "solos");
 			
 			stage.addEventListener(MouseEvent.CLICK, function(){
 				var click:SoundInstance = SoundAS.playFx(CLICK);
@@ -61,26 +61,42 @@ package
 							SoundAS.pause(MUSIC);
 							trace("pause");
 						}, 3000);
+						
 						setTimeout(function(){
 							SoundAS.resume(MUSIC);
 							trace("resume");
 						}, 3500);
+						
 						setTimeout(function(){
 							SoundAS.stopAll();
 							SoundAS.playFx(SOLO1, volume);
-							SoundAS.playFx(SOLO2, volume);
+							SoundAS.playFx(SOLO2, volume).soundCompleted.addOnce(function(si:SoundInstance){
+								setTimeout(function(){
+									SoundAS.pauseAll();
+									trace("pauseAll - Stopped");
+								}, 1000);
+								
+								setTimeout(function(){
+									SoundAS.resumeAll();
+									trace("resumeAll - Stopped");
+								}, 2000);
+							});
 						}, 5500);
+						
 						setTimeout(function(){
 							SoundAS.pauseAll();
 							trace("pauseAll");
 						}, 7000);
+						
 						setTimeout(function(){
 							SoundAS.resumeAll();
 							trace("resumeAll");
 						}, 8000);
+						
+						
 						break;
 					
-					case Keyboard.NUMBER_3:
+					case Keyboard.NUMBER_3:2
 						trace("FADES: fade, fadeMultiple, fadeMaster");
 						SoundAS.playLoop(MUSIC, volume);
 						SoundAS.fadeFrom(MUSIC, 0, 1);
@@ -183,6 +199,10 @@ package
 							}
 						}
 						break;
+					
+					case Keyboard.NUMBER_6:
+						trace("GROUPS: Play groups: music and solos. Pause solos. Resume solos. FadeOut music, FadeIn music. Set volume music. Mute solos. unMute solos. ");
+						
 				}
 				
 			});

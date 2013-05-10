@@ -13,6 +13,7 @@ The goal of SoundAS is to simplifying playback of your audio files, with a focus
 * API Chaining: SoundAS.play("music").fadeTo(0);
 * Built-in Tweening system, no dependancies
 * Modular API. If all you need is a nice wrapper around the Sound object, use SoundInstance directly and ignore the rest.
+* Non-restrictive and unambigous license
 
 #API Overview
 

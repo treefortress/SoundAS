@@ -54,7 +54,7 @@ package treefortress.sound
 		protected var _muted:Boolean;
 		protected var _volume:Number;
 		protected var _masterVolume:Number;
-		protected var _position:int;
+		//protected var _position:int;
 		protected var pauseTime:Number;
 		
 		protected var soundTransform:SoundTransform;
@@ -180,7 +180,7 @@ package treefortress.sound
 		 * Indicates whether this sound is currently paused.
 		 */
 		public function get isPaused():Boolean {
-			return pauseTime > 0;
+			return channel && sound && pauseTime > 0 && pauseTime < sound.length;
 		}
 		
 		/**
@@ -230,7 +230,7 @@ package treefortress.sound
 		 * Create a duplicate of this SoundInstance
 		 */
 		public function clone():SoundInstance {
-			var si:SoundInstance = new SoundInstance(sound);
+			var si:SoundInstance = new SoundInstance(sound, type);
 			return si;
 		}
 		
@@ -256,6 +256,7 @@ package treefortress.sound
 			var channel:SoundChannel = event.target as SoundChannel;
 			//If it's the current channel, see if we should loop.
 			if(channel == this.channel){ 
+				pauseTime = 0;
 				//loop forever?
 				if(loops == -1){ 
 					play(_volume, 0, -1, allowMultiple);
