@@ -32,7 +32,6 @@ package treefortress.sound
 			init();
 		}
 		
-		
 		/**
 		 * Dispatched when an external Sound has completed loading. 
 		 */

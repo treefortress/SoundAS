@@ -21,9 +21,9 @@ package
 		public function SoundAS_Demo(){
 			
 			SoundAS.loadSound("Click.mp3", CLICK);
-			SoundAS.loadSound("Music.mp3", MUSIC, 100, "music");
-			SoundAS.loadSound("Solo1.mp3", SOLO1, 100, "solos");
-			SoundAS.loadSound("Solo2.mp3", SOLO2, 100, "solos");
+			SoundAS.loadSound("Music.mp3", MUSIC, 100);
+			SoundAS.loadSound("Solo1.mp3", SOLO1, 100);
+			SoundAS.loadSound("Solo2.mp3", SOLO2, 100);
 			
 			stage.addEventListener(MouseEvent.CLICK, function(){
 				var click:SoundInstance = SoundAS.playFx(CLICK);
