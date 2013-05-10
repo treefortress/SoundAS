@@ -119,6 +119,11 @@ Controls playback of individual sounds, allowing you to easily stop, start, resu
     musicGroup.fadeTo(0);
     //etc...
 
+    //Stop All Groups
+    for(var i:int = SoundAS.groups.length; i--;){
+        SoundAS.groups[i].stopAll();
+    }
+
 ###Advanced 
 
     //Mute one sound
