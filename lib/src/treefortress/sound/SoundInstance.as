@@ -170,7 +170,7 @@ package treefortress.sound
 		 * Indicates whether this sound is currently playing.
 		 */
 		public function get isPlaying():Boolean {
-			return (channel && channel.position > 0);
+			return (channel && sound && channel.position > 0 && channel.position < sound.length);
 		}
 		
 		/**
@@ -258,18 +258,22 @@ package treefortress.sound
 		protected function onSoundComplete(event:Event):void {
 			//trace("stop", ++stopCount);
 			var channel:SoundChannel = event.target as SoundChannel;
+			channel.removeEventListener(Event.SOUND_COMPLETE, onSoundComplete);
+			
 			//If it's the current channel, see if we should loop.
 			if(channel == this.channel){ 
 				pauseTime = 0;
+				isPlaying
 				//loop forever?
 				if(loops == -1){ 
 					play(_volume, 0, -1, allowMultiple);
 				} 
 				//Loop set number of times?
 				else if(_loopsRemaining--){
-					play(_volume, 0, _loopsRemaining, allowMultiple);
+					play(_volume, 0, _loopsRemaining, allowMultiple);3
 				}
 				soundCompleted.dispatch(this);
+				this.channel = null;
 			}
 			//Clear out any old channels...
 			for(var i:int = oldChannels.length; i--;){

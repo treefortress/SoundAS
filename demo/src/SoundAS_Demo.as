@@ -56,7 +56,7 @@ package
 					
 					case Keyboard.NUMBER_2:
 						trace("PAUSE: Pause / Resume, PauseAll / ResumeAll");
-						SoundAS.playLoop(MUSIC, volume);
+						SoundAS.playFx(MUSIC, volume, 68000);
 						
 						setTimeout(function(){
 							SoundAS.pause(MUSIC);
@@ -64,35 +64,22 @@ package
 						}, 3000);
 						
 						setTimeout(function(){
-							SoundAS.resume(MUSIC);
-							trace("resume");
-						}, 3500);
-						
-						setTimeout(function(){
-							SoundAS.stopAll();
-							SoundAS.playFx(SOLO1, volume);
-							SoundAS.playFx(SOLO2, volume).soundCompleted.addOnce(function(si:SoundInstance){
+							SoundAS.resume(MUSIC).soundCompleted.addOnce(function(si:SoundInstance):void {
+								SoundAS.playFx(SOLO1, volume);
+								SoundAS.playFx(SOLO2, volume);
+								
 								setTimeout(function(){
 									SoundAS.pauseAll();
-									trace("pauseAll - Stopped");
+									trace("pauseAll");
 								}, 1000);
 								
 								setTimeout(function(){
 									SoundAS.resumeAll();
-									trace("resumeAll - Stopped");
+									trace("resumeAll");
 								}, 2000);
 							});
-						}, 5500);
-						
-						setTimeout(function(){
-							SoundAS.pauseAll();
-							trace("pauseAll");
-						}, 7000);
-						
-						setTimeout(function(){
-							SoundAS.resumeAll();
-							trace("resumeAll");
-						}, 8000);
+							trace("resume");
+						}, 3500);
 						
 						
 						break;
