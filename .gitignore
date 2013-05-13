@@ -1,5 +1,5 @@
-/.actionScriptProperties
-/.flexLibProperties
-/.project
-/.settings
-/demo/bin-debug
+**/.actionScriptProperties
+**/.flexLibProperties
+**/.project
+**/.settings/
+**/bin-debug
