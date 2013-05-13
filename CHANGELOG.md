@@ -5,6 +5,7 @@ CHANGELOG
 * Added support for Groups
 ** SoundAS.play becomes SoundAS().play
 ** Moved bulk of functionality to SoundManager class.
+* Added FLA-based Demo to test older versions of the compiler.
 
 
 ####April 24, 2013
