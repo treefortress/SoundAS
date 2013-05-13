@@ -13,7 +13,7 @@ package treefortress.sound
 	import org.osflash.signals.Signal;
 	
 	/**
-	 * Controls playback and loading of a group of sounds. SoundAS() references a global instance of SoundManager, but you are free to instanciate your own and use them in a modular fashion.
+	 * Controls playback and loading of a group of sounds. SoundAS references a global instance of SoundManager, but you are free to instanciate your own and use them in a modular fashion.
 	 */
 	public class SoundManager
 	{

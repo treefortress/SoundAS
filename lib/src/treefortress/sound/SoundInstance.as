@@ -265,8 +265,8 @@ package treefortress.sound
 			
 			//If it's the current channel, see if we should loop.
 			if(channel == this.channel){ 
+				this.channel = null;
 				pauseTime = 0;
-				isPlaying
 				//loop forever?
 				if(loops == -1){ 
 					play(_volume, 0, -1, allowMultiple);
@@ -276,7 +276,7 @@ package treefortress.sound
 					play(_volume, 0, _loopsRemaining, allowMultiple);3
 				}
 				soundCompleted.dispatch(this);
-				this.channel = null;
+				
 			}
 			//Clear out any old channels...
 			for(var i:int = oldChannels.length; i--;){
