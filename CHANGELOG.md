@@ -3,9 +3,9 @@ CHANGELOG
 
 ####May 5, 2013
 * Added support for Groups
-** SoundAS.play becomes SoundAS().play
 ** Moved bulk of functionality to SoundManager class.
-* Added FLA-based Demo to test older versions of the compiler.
+* Added fix for ASC1 (old AS3 Compiler)
+* Added FLA-based Demo to test the standalone Player
 
 
 ####April 24, 2013

@@ -68,11 +68,11 @@ package treefortress.sound
 		public function SoundInstance(sound:Sound = null, type:String = null){
 			this.sound = sound;
 			this.type = type;
-			group = SoundAS();
+			group = SoundAS;
 			
 			pauseTime = 0;
 			_volume = 1;			
-			_masterVolume = 1
+			_masterVolume = 1;
 			soundCompleted = new Signal(SoundInstance);
 			soundTransform = new SoundTransform();
 			oldChannels = new <SoundChannel>[];
