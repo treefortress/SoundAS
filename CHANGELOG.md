@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+####May 5, 2013
+* Added support for Groups
+** SoundAS.play becomes SoundAS().play
+** Moved bulk of functionality to SoundManager class.
+
+
 ####April 24, 2013
 * Added Test Suite
 * Added better support for orphaned channels. 

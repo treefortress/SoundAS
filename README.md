@@ -10,7 +10,7 @@ The goal of SoundAS is to simplifying playback of your audio files, with a focus
 #Features
 * Clean modern API
 * Easy memory management
-* API Chaining: SoundAS.play("music").fadeTo(0);
+* API Chaining: SoundAS().play("music").fadeTo(0);
 * Supports groups of sounds
 * Built-in Tweening system, no dependancies
 * Modular API. If all you need is a nice wrapper around the Sound object, use SoundInstance directly and ignore the rest.
@@ -21,33 +21,33 @@ The goal of SoundAS is to simplifying playback of your audio files, with a focus
 Full documentation can be found here: http://treefortress.com/libs/SoundAS/docs/.
 
 ###SoundAS
-This Static Class is the main interface for the library. It's responsible for loading and controlling all sounds globally.
+This Class is the main interface for the library. It's responsible for loading and controlling all sounds globally. 
 
 Loading / Unloading: 
 
-*    **addSound**(type:String, sound:Sound):void
-*    **loadSound**(url:String, type:String, buffer:int = 100):void
-*    **removeSound**(type:String):void
-*    **removeAll**():void
+*    **SoundAS().addSound**(type:String, sound:Sound):void
+*    **SoundAS().loadSound**(url:String, type:String, buffer:int = 100):void
+*    **SoundAS().removeSound**(type:String):void
+*    **SoundAS().removeAll**():void
 
 Playback:
 
-*    **getSound**(type:String, forceNew:Boolean = false):SoundInstance
-*    **play**(type:String, volume:Number = 1, startTime:Number = 0, loops:int = 0, allowMultiple:Boolean = false, allowInterrupt:Boolean = true):SoundInstance
-*    **playFx**(type:String, volume:Number = 1, startTime:Number = 0, loops:int = 0):SoundInstance
-*    **playLoop**(type:String, volume:Number = 1, startTime:Number = 0):SoundInstance
-*    **resume**(type:String, volume:Number = 1, startTime:Number = 0, loops:int = 0):SoundInstance
-*    **resumeAll**():void
-*    **pause**(type:String):SoundInstance
-*    **pauseAll**():void
-*    **stopAll**():void
-*    **set masterVolume**(value:Number):void
-*    **fadeFrom**(type:String, startVolume:Number = 0, endVolume:Number = 1, duration:Number = 1000)    
-*    **fadeAllFrom**(startVolume:Number = 0, endVolume:Number = 1, duration:Number = 1000)
-*    **fadeMasterFrom**(startVolume:Number = 0, endVolume:Number = 1, duration:Number = 1000)    
-*    **fadeTo**(type:String, endVolume:Number = 1, duration:Number = 1000):SoundInstance
-*    **fadeAllTo**(endVolume:Number = 1, duration:Number = 1000):SoundInstance
-*    **fadeMasterTo**(endVolume:Number = 1, duration:Number = 1000)    
+*    **SoundAS().getSound**(type:String, forceNew:Boolean = false):SoundInstance
+*    **SoundAS().play**(type:String, volume:Number = 1, startTime:Number = 0, loops:int = 0, allowMultiple:Boolean = false, allowInterrupt:Boolean = true):SoundInstance
+*    **SoundAS().playFx**(type:String, volume:Number = 1, startTime:Number = 0, loops:int = 0):SoundInstance
+*    **SoundAS().playLoop**(type:String, volume:Number = 1, startTime:Number = 0):SoundInstance
+*    **SoundAS().resume**(type:String, volume:Number = 1, startTime:Number = 0, loops:int = 0):SoundInstance
+*    **SoundAS().resumeAll**():void
+*    **SoundAS().pause**(type:String):SoundInstance
+*    **SoundAS().pauseAll**():void
+*    **SoundAS().stopAll**():void
+*    **SoundAS().set masterVolume**(value:Number):void
+*    **SoundAS().fadeFrom**(type:String, startVolume:Number = 0, endVolume:Number = 1, duration:Number = 1000)    
+*    **SoundAS().fadeAllFrom**(startVolume:Number = 0, endVolume:Number = 1, duration:Number = 1000)
+*    **SoundAS().fadeMasterFrom**(startVolume:Number = 0, endVolume:Number = 1, duration:Number = 1000)    
+*    **SoundAS().fadeTo**(type:String, endVolume:Number = 1, duration:Number = 1000):SoundInstance
+*    **SoundAS().fadeAllTo**(endVolume:Number = 1, duration:Number = 1000):SoundInstance
+*    **SoundAS().fadeMasterTo**(endVolume:Number = 1, duration:Number = 1000)    
 
 ####SoundInstance
 Controls playback of individual sounds, allowing you to easily stop, start, resume and set volume or position.
@@ -68,45 +68,45 @@ Controls playback of individual sounds, allowing you to easily stop, start, resu
 ###Loading
 
     //Load sound from an external file
-    SoundAS.loadSound("assets/Click.mp3", "click");
+    SoundAS().loadSound("assets/Click.mp3", "click");
 
     //Inject an already loaded Sound instance
-    SoundAS.addSound(clickSound, "click");
+    SoundAS().addSound(clickSound, "click");
 
 ###Basic Playback
 
     //Play sound.
         //allowMultiple: Allow multiple overlapping sound instances.
         //allowInterrupt: If this sound is currently playing, start it over.
-    SoundAS.play("click", volume, startTime, loops, allowMultiple, allowInterrupt);
+    SoundAS().play("click", volume, startTime, loops, allowMultiple, allowInterrupt);
 
     //Shortcut for typical game fx (no looping, allows for multiple instances)
-    SoundAS.playFx("click");
+    SoundAS().playFx("click");
 
     //Shortcut for typical game music (loops forever, no multiple instances)
-    SoundAS.playLoop("music");
+    SoundAS().playLoop("music");
 
     //Toggle Mute for all sounds
-    SoundAS.mute = !SoundAS.mute;
+    SoundAS().mute = !SoundAS().mute;
 
     //PauseAll / ResumeAll
-    SoundAS.pauseAll();
-    SoundAS.resumeAll();
+    SoundAS().pauseAll();
+    SoundAS().resumeAll();
      
     //Toggle Pause on individual song
-    var sound:SoundInstance = SoundAS.getSound("music");
+    var sound:SoundInstance = SoundAS().getSound("music");
     (sound.isPaused)? sound.resume() : sound.pause();
 
     //Fade Out
-    SoundAS.getSound("click").fadeTo(0);
+    SoundAS().getSound("click").fadeTo(0);
 
     //Fade masterVolume out
-    SoundAS.fadeMasterTo(0);
+    SoundAS().fadeMasterTo(0);
 
 ### Groups
 
     //Create a group
-    var musicGroup:SoundManager = SoundAS.group("music");
+    var musicGroup:SoundManager = SoundAS().group("music");
 
     //Add sound(s) to group
     musicGroup.loadSound("assets/TitleMusic.mp3", "titleMusic");
@@ -120,8 +120,8 @@ Controls playback of individual sounds, allowing you to easily stop, start, resu
     //etc...
 
     //Stop All Groups
-    for(var i:int = SoundAS.groups.length; i--;){
-        SoundAS.groups[i].stopAll();
+    for(var i:int = SoundAS().groups.length; i--;){
+        SoundAS().groups[i].stopAll();
     }
 
 ###Advanced 
@@ -130,7 +130,7 @@ Controls playback of individual sounds, allowing you to easily stop, start, resu
     SoundsAS.getSound("click").mute = true;
 
     //Fade from .3 to .7 over 3 seconds
-    SoundAS.getSound("click").fadeFrom(.3, .7, 3000);
+    SoundAS().getSound("click").fadeFrom(.3, .7, 3000);
 
 	//Manage a SoundInstance directly and ignore SoundAS
     var sound:SoundInstance = new SoundInstance(mySound, "click");
@@ -140,12 +140,12 @@ Controls playback of individual sounds, allowing you to easily stop, start, resu
 	sound.fadeTo(0);
 
     //String 2 songs together
-    SoundAS.play(MUSIC1).soundCompleted.addOnce(function(si:SoundInstance){
-        SoundAS.playLoop(MUSIC2);
+    SoundAS().play(MUSIC1).soundCompleted.addOnce(function(si:SoundInstance){
+        SoundAS().playLoop(MUSIC2);
     }
 
     //Loop twice, and trigger something when all loops are finished.
-    SoundAS.play(MUSIC1, 1, 0, 2).soundCompleted.add(function(si:SoundInstance){
+    SoundAS().play(MUSIC1, 1, 0, 2).soundCompleted.add(function(si:SoundInstance){
         if(si.loopsRemaining == -1){
             trace("Loops completed!");
             si.soundCompleted.removeAll();

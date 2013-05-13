@@ -27,11 +27,11 @@ package treefortress.sound
 			
 			if(isMasterFade){
 				if(t - startTime < duration){
-					SoundAS.masterVolume = easeOutQuad(t - startTime, startVolume, endVolume - startVolume, duration);
+					SoundAS().masterVolume = easeOutQuad(t - startTime, startVolume, endVolume - startVolume, duration);
 				} else {
-					SoundAS.masterVolume = endVolume;
+					SoundAS().masterVolume = endVolume;
 				}
-				_isComplete = SoundAS.masterVolume == endVolume;
+				_isComplete = SoundAS().masterVolume == endVolume;
 				
 			} else {
 				if(t - startTime < duration){

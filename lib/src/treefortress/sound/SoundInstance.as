@@ -7,6 +7,9 @@ package treefortress.sound
 	
 	import org.osflash.signals.Signal;
 	
+	/**
+	 * Controls playback of a single sound. Comes with convenience methods for all the common Sound APIs (pause, resume, set position, volume etc). This can be used in a modular fashion if all you need is a simple wrapper around the Sound class.
+	 */
 	public class SoundInstance {
 		
 		
@@ -65,7 +68,7 @@ package treefortress.sound
 		public function SoundInstance(sound:Sound = null, type:String = null){
 			this.sound = sound;
 			this.type = type;
-			group = SoundAS;
+			group = SoundAS();
 			
 			pauseTime = 0;
 			_volume = 1;			

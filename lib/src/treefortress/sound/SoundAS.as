@@ -1,6 +1,9 @@
+
+
 package treefortress.sound
 {
-	public function get SoundAS() : SoundManager { 
+	/** Provides a convenience instance of SoundManager to be used globally **/
+	public function SoundAS() : SoundManager { 
 		return instance; 
 	}
 }
