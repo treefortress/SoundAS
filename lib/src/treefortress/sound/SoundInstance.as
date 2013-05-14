@@ -136,8 +136,9 @@ package treefortress.sound
 		 */
 		public function stop():SoundInstance {
 			pauseTime = 0;
-			stopChannel(channel);
 			stopOldChannels();
+			stopChannel(channel);
+			channel = null;
 			return this;
 		}
 		
@@ -252,6 +253,7 @@ package treefortress.sound
 			sound = null;
 			soundTransform = null;
 			stopChannel(channel);
+			channel = null;
 			endFade();
 		}
 		

@@ -25,7 +25,6 @@ package
 			SoundAS.loadSound("Music.mp3", MUSIC, 100);
 			SoundAS.loadSound("Solo1.mp3", SOLO1, 100);
 			SoundAS.loadSound("Solo2.mp3", SOLO2, 100);
-			trace("HEY");
 			
 			stage.addEventListener(MouseEvent.CLICK, function(){
 				var click:SoundInstance = SoundAS.playFx(CLICK);
@@ -43,6 +42,7 @@ package
 						setTimeout(function(){
 							SoundAS.getSound(MUSIC).stop();
 							trace("stop");
+							trace("isPlaying:", SoundAS.getSound(MUSIC).isPlaying);
 						}, 3000);
 						setTimeout(function(){
 							trace("playMultiple");
