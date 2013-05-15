@@ -55,7 +55,7 @@ package treefortress.sound
 		 * @param allowMultiple Allow multiple, overlapping instances of this Sound (useful for SoundFX)
 		 * @param allowInterrupt If this sound is currently playing, interrupt it and start at the specified StartTime. Otherwise, just update the Volume.
 		 */
-		public function play(type:String, volume:Number = 1, startTime:Number = 0, loops:int = 0, allowMultiple:Boolean = false, allowInterrupt:Boolean = true):SoundInstance {
+		public function play(type:String, volume:Number = 1, startTime:Number = 0, loops:int = 0, allowMultiple:Boolean = false, allowInterrupt:Boolean = true, enableSeamlessLoops:Boolean = false):SoundInstance {
 			var si:SoundInstance = getSound(type);
 			
 			//Sound is playing, and we're not allowed to interrupt it. Just set volume.
@@ -64,7 +64,7 @@ package treefortress.sound
 			} 
 				//Play sound
 			else {
-				si.play(volume, startTime, loops, allowMultiple);
+				si.play(volume, startTime, loops, allowMultiple, enableSeamlessLoops);
 			}
 			return si;
 		}
@@ -72,8 +72,8 @@ package treefortress.sound
 		/**
 		 * Convenience function to play a sound that should loop forever.
 		 */
-		public function playLoop(type:String, volume:Number = 1, startTime:Number = 0):SoundInstance {
-			return play(type, volume, startTime, -1, false);
+		public function playLoop(type:String, volume:Number = 1, startTime:Number = 0, enableSeamlessLoops:Boolean = true):SoundInstance {
+			return play(type, volume, startTime, -1, false, true, enableSeamlessLoops);
 		}
 		
 		/**

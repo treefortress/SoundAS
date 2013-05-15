@@ -1,5 +1,8 @@
 CHANGELOG
 =========
+####May 15, 2013
+* Bug Fixes
+* Added support for seamless looping (when instance.enableSeamlessLooping == true)
 
 ####May 5, 2013
 * Added support for Groups

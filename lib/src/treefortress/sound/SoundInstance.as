@@ -59,7 +59,7 @@ package treefortress.sound
 		protected var _muted:Boolean;
 		protected var _volume:Number;
 		protected var _masterVolume:Number;
-		//protected var _position:int;
+		protected var _enableSeamlessLoops:Boolean;
 		protected var pauseTime:Number;
 		
 		protected var soundTransform:SoundTransform;
@@ -79,32 +79,52 @@ package treefortress.sound
 		}
 		
 		/**
+		 * When is is enabled, you will have seamless looping of your sound files (assuming they are encoded properly), but will experience issues when pausing/resuming them.
+		 * The bug is detailed here: http://www.stevensacks.net/2008/08/07/as3-sound-channel-bug/. As a workaround, always stop your looping sounds and start over, do not try and resume. 
+		 */
+		public function get enableSeamlessLoops():Boolean {
+			return _enableSeamlessLoops;
+		}
+
+		/**
 		 * Play this Sound 
 		 * @param volume
 		 * @param startTime Start position in milliseconds
 		 * @param loops Number of times to loop Sound. Pass -1 to loop forever.
 		 * @param allowMultiple Allow multiple concurrent instances of this Sound
+		 * @param allow seamless sound loops. Note that this will exhibit a bug when attempting to pause/resume the looping sound.
 		 */
-		public function play(volume:Number = 1, startTime:Number = 0, loops:int = 0, allowMultiple:Boolean = true):SoundInstance {
+		public function play(volume:Number = 1, startTime:Number = 0, loops:int = 0, allowMultiple:Boolean = true, enableSeamlessLoops:Boolean = false):SoundInstance {
 			this.loops = loops;
-			//If it's an infinite loop, set loopsRemaining to 0
-			this._loopsRemaining = loops == -1? 0 : loops;
+			_enableSeamlessLoops = enableSeamlessLoops;
+			
+			//If loops == -1, switch it to loop infinitely
+			loops = (loops < 0)? int.MAX_VALUE : loops;
+			_loopsRemaining = 0; 
+			
+			//When not using seamless looping, maintain an internal loopsRemaining counter, and loop manually on soudn complete.
+			//This avoids a SoundAPI bug with pause/resume: http://www.stevensacks.net/2008/08/07/as3-sound-channel-bug/
+			if(enableSeamlessLoops == false){
+				_loopsRemaining = loops;
+				loops = 0;
+			}
+			
 			this.allowMultiple = allowMultiple;
 			if(allowMultiple){
 				//Store old channel, so we can still stop it if requested.
 				if(channel){
 					oldChannels.push(channel);
 				}
-				channel = sound.play(startTime, 0);
+				channel = sound.play(startTime, loops);
 			} else {
 				if(channel){ 
 					stopChannel(channel);
 				}
-				channel = sound.play(startTime, 0);
+				channel = sound.play(startTime, loops);
 			}
 			channel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
-			
 			pauseTime = 0; //Always reset pause time on play
+			
 			this.volume = volume;	
 			this.mute = mute;
 			return this;
@@ -261,7 +281,6 @@ package treefortress.sound
 		 * Dispatched when Sound has finished playback
 		 */
 		protected function onSoundComplete(event:Event):void {
-			//trace("stop", ++stopCount);
 			var channel:SoundChannel = event.target as SoundChannel;
 			channel.removeEventListener(Event.SOUND_COMPLETE, onSoundComplete);
 			
@@ -269,13 +288,16 @@ package treefortress.sound
 			if(channel == this.channel){ 
 				this.channel = null;
 				pauseTime = 0;
-				//loop forever?
-				if(loops == -1){ 
-					play(_volume, 0, -1, allowMultiple);
-				} 
-				//Loop set number of times?
-				else if(_loopsRemaining--){
-					play(_volume, 0, _loopsRemaining, allowMultiple);3
+				//Loop manually?
+				if(_enableSeamlessLoops == false){
+					//loop forever?
+					if(loops == -1){ 
+						play(_volume, 0, -1, allowMultiple);
+					} 
+					//Loop set number of times?
+					else if(_loopsRemaining--){
+						play(_volume, 0, _loopsRemaining, allowMultiple);
+					}
 				}
 				soundCompleted.dispatch(this);
 				

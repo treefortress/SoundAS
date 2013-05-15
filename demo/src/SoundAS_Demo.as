@@ -21,10 +21,13 @@ package
 		
 		public function SoundAS_Demo(){
 			
+			SoundAS.loadSound("Loop.mp3", "loop");
 			SoundAS.loadSound("Click.mp3", CLICK);
 			SoundAS.loadSound("Music.mp3", MUSIC, 100);
 			SoundAS.loadSound("Solo1.mp3", SOLO1, 100);
 			SoundAS.loadSound("Solo2.mp3", SOLO2, 100);
+			
+			//SoundAS.playLoop("loop", 1, 10000);
 			
 			stage.addEventListener(MouseEvent.CLICK, function(){
 				var click:SoundInstance = SoundAS.playFx(CLICK);
@@ -161,6 +164,7 @@ package
 						var solo:SoundInstance = SoundAS.play(SOLO1, volume, 0, 2);
 						solo.soundCompleted.add(playPause);
 						playPause(solo);
+						
 						function playPause(si:SoundInstance):void {
 							if(solo.loopsRemaining == -1){ 
 								trace("INFINITE LOOP: 5 seconds of repeating Clicks");
@@ -246,6 +250,19 @@ package
 								SoundAS.groups[i].stopAll();
 							}
 						}, 9000);
+						
+						break;
+					
+					case Keyboard.NUMBER_7:
+						trace("Loop - Seamless");
+						SoundAS.playLoop("loop", volume, 0, true);
+						setTimeout(function(){
+							trace("Loop - Non-Seamless");
+							SoundAS.stopAll();
+							SoundAS.play("loop", volume, 0, 2);
+							
+						}, 15000);
+						
 				}
 				
 			});

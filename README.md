@@ -9,11 +9,12 @@ The goal of SoundAS is to simplifying playback of your audio files, with a focus
 
 #Features
 * Clean modern API
-* Easy memory management
 * API Chaining: SoundAS.play("music").fadeTo(0);
 * Supports groups of sounds
+* Supports seamless looping
+* Supports workaround for the 'looping bug' (http://www.stevensacks.net/2008/08/07/as3-sound-channel-bug/)
 * Built-in Tweening system, no dependancies
-* Modular API. If all you need is a nice wrapper around the Sound object, use SoundInstance directly and ignore the rest.
+* Modular API: Use SoundInstance directly and ignore the rest.
 * Non-restrictive and unambigous license
 
 #API Overview
@@ -33,9 +34,9 @@ Loading / Unloading:
 Playback:
 
 *    **SoundAS.getSound**(type:String, forceNew:Boolean = false):SoundInstance
-*    **SoundAS.play**(type:String, volume:Number = 1, startTime:Number = 0, loops:int = 0, allowMultiple:Boolean = false, allowInterrupt:Boolean = true):SoundInstance
+*    **SoundAS.play**(type:String, volume:Number = 1, startTime:Number = 0, loops:int = 0, allowMultiple:Boolean = false, allowInterrupt:Boolean = true, enableSeamlessLoops:Boolean = false):SoundInstance
 *    **SoundAS.playFx**(type:String, volume:Number = 1, startTime:Number = 0, loops:int = 0):SoundInstance
-*    **SoundAS.playLoop**(type:String, volume:Number = 1, startTime:Number = 0):SoundInstance
+*    **SoundAS.playLoop**(type:String, volume:Number = 1, startTime:Number = 0, enableSeamlessLoops:Boolean = true):SoundInstance
 *    **SoundAS.resume**(type:String, volume:Number = 1, startTime:Number = 0, loops:int = 0):SoundInstance
 *    **SoundAS.resumeAll**():void
 *    **SoundAS.pause**(type:String):SoundInstance
