@@ -12,6 +12,7 @@ package treefortress.sound
 	
 	import org.osflash.signals.Signal;
 	
+	
 	/**
 	 * Controls playback and loading of a group of sounds. SoundAS references a global instance of SoundManager, but you are free to instanciate your own and use them in a modular fashion.
 	 */
@@ -45,6 +46,7 @@ package treefortress.sound
 		 * Dispatched when an external Sound has failed loading. 
 		 */
 		public var loadFailed:Signal;
+		public var parent:SoundManager;
 		
 		/**
 		 * Play audio by type. It must already be loaded into memory using the addSound() or loadSound() APIs. 
@@ -54,6 +56,7 @@ package treefortress.sound
 		 * @param loops Number of times to loop audio, pass -1 to loop forever.
 		 * @param allowMultiple Allow multiple, overlapping instances of this Sound (useful for SoundFX)
 		 * @param allowInterrupt If this sound is currently playing, interrupt it and start at the specified StartTime. Otherwise, just update the Volume.
+		 * @param enableSeamlessLoops If this sound is currently playing, interrupt it and start at the specified StartTime. Otherwise, just update the Volume.
 		 */
 		public function play(type:String, volume:Number = 1, startTime:Number = 0, loops:int = 0, allowMultiple:Boolean = false, allowInterrupt:Boolean = true, enableSeamlessLoops:Boolean = false):SoundInstance {
 			var si:SoundInstance = getSound(type);
@@ -127,47 +130,48 @@ package treefortress.sound
 		/** 
 		 * Fade specific sound starting at the current volume
 		 **/
-		public function fadeTo(type:String, endVolume:Number = 1, duration:Number = 1000):SoundInstance {
-			return getSound(type).fadeTo(endVolume, duration);
+		public function fadeTo(type:String, endVolume:Number = 1, duration:Number = 1000, stopAtZero:Boolean = true):SoundInstance {
+			return getSound(type).fadeTo(endVolume, duration, stopAtZero);
 		}
 		
 		/**
 		 * Fade all sounds starting from their current Volume
 		 */
-		public function fadeAllTo(endVolume:Number = 1, duration:Number = 1000):void {
+		public function fadeAllTo(endVolume:Number = 1, duration:Number = 1000, stopAtZero:Boolean = true):void {
 			for(var i:int = instances.length; i--;){
-				instances[i].fadeTo(endVolume, duration);
+				instances[i].fadeTo(endVolume, duration, stopAtZero);
 			}
 		}
 		
 		/** 
 		 * Fade master volume starting at the current value
 		 **/
-		public function fadeMasterTo(endVolume:Number = 1, duration:Number = 1000):void {
-			addMasterTween(_masterVolume, endVolume, duration);
+		public function fadeMasterTo(endVolume:Number = 1, duration:Number = 1000, stopAtZero:Boolean = true):void {
+			addMasterTween(_masterVolume, endVolume, duration, stopAtZero);
+			
 		}
 		
 		/** 
 		 * Fade specific sound specifying both the StartVolume and EndVolume.
 		 **/
-		public function fadeFrom(type:String, startVolume:Number = 0, endVolume:Number = 1, duration:Number = 1000):SoundInstance {
-			return getSound(type).fadeFrom(startVolume, endVolume, duration);
+		public function fadeFrom(type:String, startVolume:Number = 0, endVolume:Number = 1, duration:Number = 1000, stopAtZero:Boolean = true):SoundInstance {
+			return getSound(type).fadeFrom(startVolume, endVolume, duration, stopAtZero);
 		}
 		
 		/**
 		 * Fade all sounds specifying both the StartVolume and EndVolume.
 		 */
-		public function fadeAllFrom(startVolume:Number = 0, endVolume:Number = 1, duration:Number = 1000):void {
+		public function fadeAllFrom(startVolume:Number = 0, endVolume:Number = 1, duration:Number = 1000, stopAtZero:Boolean = true):void {
 			for(var i:int = instances.length; i--;){
-				instances[i].fadeFrom(startVolume, endVolume, duration);
+				instances[i].fadeFrom(startVolume, endVolume, duration, stopAtZero);
 			}
 		}
 		
 		/** 
 		 * Fade master volume specifying both the StartVolume and EndVolume.
 		 **/
-		public function fadeMasterFrom(startVolume:Number = 0, endVolume:Number = 1, duration:Number = 1000):void {
-			addMasterTween(startVolume, endVolume, duration);
+		public function fadeMasterFrom(startVolume:Number = 0, endVolume:Number = 1, duration:Number = 1000, stopAtZero:Boolean = true):void {
+			addMasterTween(startVolume, endVolume, duration, stopAtZero);
 		}
 		
 		/**
@@ -197,6 +201,13 @@ package treefortress.sound
 		 */
 		public function getSound(type:String, forceNew:Boolean = false):SoundInstance {
 			var si:SoundInstance = instancesByType[type];
+			if(!si && parent){ si = parent.getSound(type); }
+			if(!si && groups){
+				for(var i:int = groups.length; i--;){
+					si = groups[i].getSound(type);
+					if(si){ break; }
+				}
+			}
 			if(!si){ throw(new Error("[SoundAS] Sound with type '"+type+"' does not appear to be loaded.")); }
 			if(forceNew){
 				si = si.clone();	
@@ -288,9 +299,11 @@ package treefortress.sound
 		public function group(name:String):SoundManager {
 			if(!groupsByName[name]){ 
 				groupsByName[name] = new SoundManager(); 
+				(groupsByName[name] as SoundManager).parent = this;
 				
 				if(!groups){ groups = new <SoundManager>[]; }
 				groups.push(groupsByName[name]);
+				
 			}
 			return groupsByName[name];
 		}
@@ -313,9 +326,10 @@ package treefortress.sound
 			activeTweens = new Vector.<SoundTween>();
 		}
 		
-		internal function addMasterTween(startVolume:Number, endVolume:Number, duration:Number = 1000):void {
+		internal function addMasterTween(startVolume:Number, endVolume:Number, duration:Number, stopAtZero:Boolean):void {
 			if(!_masterTween){ _masterTween = new SoundTween(null, 0, 0, true); }
 			_masterTween.init(startVolume, endVolume, duration);
+			_masterTween.stopAtZero = stopAtZero;
 			_masterTween.update(0);
 			//Only add masterTween if it isn't already active.
 			if(activeTweens.indexOf(_masterTween) == -1){
@@ -324,13 +338,17 @@ package treefortress.sound
 			tickEnabled = true;
 		}
 		
-		internal function addTween(type:String, startVolume:Number, endVolume:Number, duration:Number):SoundTween {
+		internal function addTween(type:String, startVolume:Number, endVolume:Number, duration:Number, stopAtZero:Boolean):SoundTween {
 			var si:SoundInstance = getSound(type);
 			if(startVolume >= 0){ si.volume = startVolume; }
+			
+			//Kill any active fade, it will get removed the next time the tweens are updated.
+			if(si.fade){ si.fade.kill(); }
+			
 			var tween:SoundTween = new SoundTween(si, endVolume, duration);
+			tween.stopAtZero = stopAtZero;
 			tween.update(0);
-			//Kill any active tween, it will get removed the next time the tweens are updated.
-			si.endFade();
+			
 			//Add new tween
 			activeTweens.push(tween);
 			
@@ -342,6 +360,7 @@ package treefortress.sound
 			var t:int = getTimer();
 			for(var i:int = activeTweens.length; i--;){
 				if(activeTweens[i].update(t)){
+					activeTweens[i].end();
 					activeTweens.splice(i, 1);
 				}
 			}
@@ -350,7 +369,7 @@ package treefortress.sound
 		
 		protected function addInstance(si:SoundInstance):void {
 			si.mute = _mute;
-			si.group = this;
+			si.manager = this;
 			if(instances.indexOf(si) == -1){ instances.push(si); }
 			instancesBySound[si.sound] = si;
 			instancesByType[si.type] = si;
