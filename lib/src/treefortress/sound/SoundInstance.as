@@ -290,17 +290,23 @@ package treefortress.sound
 			
 			//If it's the current channel, see if we should loop.
 			if(channel == this.channel){ 
-				pauseTime = 0;
-				//loop forever?
-				if(loops == -1){ 
-					play(_volume, 0, -1, allowMultiple);
-				} 
-				//Loop set number of times?
-				else if(_loopsRemaining--){
-					play(_volume, 0, _loopsRemaining, allowMultiple);3
-				}
-				soundCompleted.dispatch(this);
 				this.channel = null;
+				pauseTime = 0;
+				//Loop manually?
+				if(_enableSeamlessLoops == false){
+					//loop forever?
+					if(loops == -1){ 
+						play(_volume, 0, -1, allowMultiple);
+					} 
+					//Loop set number of times?
+					else if(_loopsRemaining--){
+						play(_volume, 0, _loopsRemaining, allowMultiple);
+					} else {
+						soundCompleted.dispatch(this);
+					}
+				} else {
+					soundCompleted.dispatch(this);
+				}
 			}
 			//Clear out any old channels...
 			for(var i:int = oldChannels.length; i--;){

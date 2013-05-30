@@ -61,6 +61,9 @@ package treefortress.sound
 		public function play(type:String, volume:Number = 1, startTime:Number = 0, loops:int = 0, allowMultiple:Boolean = false, allowInterrupt:Boolean = true, enableSeamlessLoops:Boolean = false):SoundInstance {
 			var si:SoundInstance = getSound(type);
 			
+			//If we retrieved this instance from another manager, add it to our internal list of active instances.
+			if(instances.indexOf(si) == -1){  }
+			
 			//Sound is playing, and we're not allowed to interrupt it. Just set volume.
 			if(!allowInterrupt && si.isPlaying){
 				si.volume = volume;
@@ -200,12 +203,24 @@ package treefortress.sound
 		 * Returns a SoundInstance for a specific type.
 		 */
 		public function getSound(type:String, forceNew:Boolean = false):SoundInstance {
+			if(type == null){ 
+				return null; 
+			}
+			//Try and retrieve instance from this manager.
 			var si:SoundInstance = instancesByType[type];
-			if(!si && parent){ si = parent.getSound(type); }
-			if(!si && groups){
-				for(var i:int = groups.length; i--;){
-					si = groups[i].getSound(type);
-					if(si){ break; }
+			if(!si){
+				//If instance was not found, check out parent manager;
+				if(!si && parent){ si = parent.getSound(type); }
+				//Still not found, check the children.
+				if(!si && groups){
+					for(var i:int = groups.length; i--;){
+						si = groups[i].getSound(type);
+						if(si){ break; }
+					}
+				}
+				//If we've found it, add it to our local instance list:
+				if(si && instances.indexOf(si) == -1){
+					addInstance(si);
 				}
 			}
 			if(!si){ throw(new Error("[SoundAS] Sound with type '"+type+"' does not appear to be loaded.")); }

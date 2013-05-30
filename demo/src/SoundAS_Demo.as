@@ -161,26 +161,25 @@ package
 					
 					case Keyboard.NUMBER_5:
 						trace("LOOPING: Loop solo 2 times, pause halfway each time. Shows workaround for the 'loop bug': http://www.stevensacks.net/2008/08/07/as3-sound-channel-bug/ ");
-						var solo:SoundInstance = SoundAS.play(SOLO1, volume, 0, 2);
+						var solo:SoundInstance = SoundAS.play(SOLO1, volume, 0, 0);
+						var loopCount:int = 0;
 						solo.soundCompleted.add(playPause);
 						playPause(solo);
 						
 						function playPause(si:SoundInstance):void {
-							if(solo.loopsRemaining == -1){ 
+							if(++loopCount == 3){ 
 								trace("INFINITE LOOP: 5 seconds of repeating Clicks");
 								var startTime:int = getTimer();
-								var click:SoundInstance = SoundAS.playLoop(CLICK);
-								click.soundCompleted.add(function(si:SoundInstance){
-									trace("soundComplete");
-									//Stop after 5 seconds
-									if(getTimer() - startTime > 5000){
-										click.stop();
-										click.soundCompleted.removeAll();
-										solo.soundCompleted.removeAll();
-									}
-								});
+								var click:SoundInstance = SoundAS.play(CLICK, 1, 0, -1, false, false, true);
+								setTimeout(function(){
+									trace("stop Clicks");
+									click.stop();
+									click.soundCompleted.removeAll();
+									solo.soundCompleted.removeAll();
+								}, 5000);
 							} 
 							else {
+								SoundAS.play(SOLO1, volume, 0, 0);
 								setTimeout(function(){
 									solo.pause();
 									trace("pause");

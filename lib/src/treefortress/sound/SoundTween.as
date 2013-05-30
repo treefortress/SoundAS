@@ -10,9 +10,9 @@ package treefortress.sound
 		public var startVolume:Number;
 		public var endVolume:Number;
 		public var duration:Number;
-		public var sound:SoundInstance;
-		
+
 		protected var isMasterFade:Boolean;
+		protected var _sound:SoundInstance;
 		protected var _isComplete:Boolean;
 
 		public var ended:Signal;
@@ -23,6 +23,7 @@ package treefortress.sound
 				sound = si;
 				startVolume = sound.volume;
 			}
+			
 			ended = new Signal(SoundInstance);
 			this.isMasterFade = isMasterFade;
 			init(startVolume, endVolume, duration);
@@ -64,11 +65,13 @@ package treefortress.sound
 		 * **/
 		public function end(applyEndVolume:Boolean = false):void {
 			_isComplete = true;
-			if(applyEndVolume){
-				sound.volume = endVolume;
-			}
-			if(stopAtZero && sound.volume == 0){
-				sound.stop();
+			if(!isMasterFade){
+				if(applyEndVolume){
+					sound.volume = endVolume;
+				}
+				if(stopAtZero && sound.volume == 0){
+					sound.stop();
+				}
 			}
 			ended.dispatch(this.sound);
 			ended.removeAll();
@@ -97,6 +100,14 @@ package treefortress.sound
 		
 		public function get isComplete():Boolean {
 			return _isComplete;
+		}
+
+		public function get sound():SoundInstance { return _sound; }
+		public function set sound(value:SoundInstance):void {
+			_sound = value;
+			if(!sound){
+				trace("SOUND IS NULLLLL");
+			}
 		}
 
 
