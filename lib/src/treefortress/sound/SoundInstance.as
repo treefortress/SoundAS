@@ -61,6 +61,7 @@ package treefortress.sound
 		protected var _masterVolume:Number;
 		protected var _enableSeamlessLoops:Boolean;
 		protected var pauseTime:Number;
+		protected var _isPlaying:Boolean;
 		
 		protected var soundTransform:SoundTransform;
 		internal var currentTween:SoundTween;
@@ -123,7 +124,10 @@ package treefortress.sound
 				}
 				channel = sound.play(startTime, loops);
 			}
-			channel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
+			if(channel){ 				
+				channel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
+				_isPlaying = true;
+			}
 			pauseTime = 0; //Always reset pause time on play
 			
 			this.volume = volume;	
@@ -140,6 +144,7 @@ package treefortress.sound
 		 */
 		public function pause():SoundInstance {
 			if(!channel){ return this; }
+			_isPlaying = false;
 			pauseTime = channel.position;
 			stopChannel(channel);
 			stopOldChannels();
@@ -162,7 +167,9 @@ package treefortress.sound
 		public function stop():SoundInstance {
 			pauseTime = 0;
 			stopChannel(channel);
+			channel = null;
 			stopOldChannels();
+			_isPlaying = false;
 			return this;
 		}
 		
@@ -198,7 +205,7 @@ package treefortress.sound
 		 * Indicates whether this sound is currently playing.
 		 */
 		public function get isPlaying():Boolean {
-			return (channel && sound && channel.position > 0 && channel.position < sound.length);
+			return _isPlaying;
 		}
 		
 		/**
@@ -277,6 +284,7 @@ package treefortress.sound
 			sound = null;
 			soundTransform = null;
 			stopChannel(channel);
+			channel = null;
 			fade.end(false);
 		}
 		
@@ -302,6 +310,7 @@ package treefortress.sound
 					else if(_loopsRemaining--){
 						play(_volume, 0, _loopsRemaining, allowMultiple);
 					} else {
+						_isPlaying = false;
 						soundCompleted.dispatch(this);
 					}
 				} else {
