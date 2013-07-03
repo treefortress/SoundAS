@@ -5,7 +5,9 @@ package
 	import flash.events.MouseEvent;
 	import flash.media.Sound;
 	import flash.ui.Keyboard;
+	import flash.utils.clearInterval;
 	import flash.utils.getTimer;
+	import flash.utils.setInterval;
 	import flash.utils.setTimeout;
 	
 	import treefortress.sound.SoundAS;
@@ -39,6 +41,7 @@ package
 				switch(event.keyCode){
 					
 					case Keyboard.NUMBER_1:
+						
 						trace("Testing PLAY: Play / Stop / PlayMultiple / StopMultiple");
 						SoundAS.playLoop(MUSIC, volume);
 						trace("play");
@@ -49,7 +52,7 @@ package
 						}, 3000);
 						setTimeout(function(){
 							trace("playMultiple");
-							SoundAS.playFx(SOLO1, volume);
+							SoundAS.playFx(SOLO1, volume)
 							SoundAS.playFx(SOLO2, volume);
 						}, 4000);
 						setTimeout(function(){
@@ -253,15 +256,31 @@ package
 						
 						break;
 					
-					case Keyboard.NUMBER_7:
-						trace("Loop - Seamless");
-						SoundAS.playLoop("loop", volume, 0, true);
+					case Keyboard.NUMBER_8:
+						trace("isPlaying / isPaused");
+						
+						SoundAS.play(SOLO2, 1);
+						var intervalId:int = setInterval(function(){
+							trace(SoundAS.getSound(SOLO2).isPlaying);
+						}, 20);
+						
 						setTimeout(function(){
-							trace("Loop - Non-Seamless");
-							SoundAS.stopAll();
-							SoundAS.play("loop", volume, 0, 2);
-							
-						}, 15000);
+							SoundAS.getSound(SOLO2).pause();
+						}, 1000);
+						
+						setTimeout(function(){
+							SoundAS.getSound(SOLO2).resume();
+						}, 2000);
+						
+						setTimeout(function(){
+							SoundAS.play(SOLO2, 1);
+							SoundAS.fadeTo(SOLO2, 0, 1000).fade.stopAtZero = true;
+						}, 4000);
+						
+						setTimeout(function(){
+							clearInterval(intervalId);
+						}, 6000);
+						return;
 						
 				}
 				
