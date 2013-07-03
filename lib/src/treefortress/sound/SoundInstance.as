@@ -58,12 +58,13 @@ package treefortress.sound
 		protected var _loopsRemaining:int;
 		protected var _muted:Boolean;
 		protected var _volume:Number;
+		protected var _pan:Number;
 		protected var _masterVolume:Number;
 		protected var _enableSeamlessLoops:Boolean;
 		protected var pauseTime:Number;
 		protected var _isPlaying:Boolean;
 		
-		protected var soundTransform:SoundTransform;
+		protected var _soundTransform:SoundTransform;
 		internal var currentTween:SoundTween;
 		
 		
@@ -73,10 +74,11 @@ package treefortress.sound
 			this.type = type;
 			manager = SoundAS;
 			pauseTime = 0;
-			_volume = 1;			
+			_volume = 1;	
+			_pan = 0;
 			_masterVolume = 1
+			_soundTransform = new SoundTransform();
 			soundCompleted = new Signal(SoundInstance);
-			soundTransform = new SoundTransform();
 			oldChannels = new <SoundChannel>[];
 		}
 		
@@ -242,12 +244,22 @@ package treefortress.sound
 			//Update the voume value, but respect the mute flag.
 			if(value < 0){ value = 0; } else if(value > 1 || isNaN(volume)){ value = 1; }
 			_volume = value;
-			if(_muted){ return; }
-			
-			//Update actual sound volume
-			if(!soundTransform){ soundTransform = new SoundTransform(); }
 			soundTransform.volume = mixedVolume;
-			if(channel){
+			if(!_muted && channel){
+				channel.soundTransform = soundTransform;
+				updateOldChannels();
+			}
+		}
+		
+		/**
+		 * The left-to-right panning of the sound, ranging from -1 (full pan left) to 1 (full pan right).
+		 */
+		public function get pan():Number { return _pan; }
+		public function set pan(value:Number):void {
+			//Update the voume value, but respect the mute flag.
+			if(value < -1){ value = -1; } else if(value > 1 || isNaN(volume)){ value = 1; }
+			_pan = soundTransform.pan = value;
+			if(!_muted && channel){
 				channel.soundTransform = soundTransform;
 				updateOldChannels();
 			}
@@ -282,7 +294,7 @@ package treefortress.sound
 				sound.close();
 			} catch(e:Error){}
 			sound = null;
-			soundTransform = null;
+			_soundTransform = null;
 			stopChannel(channel);
 			channel = null;
 			fade.end(false);
@@ -362,11 +374,21 @@ package treefortress.sound
 		protected function updateOldChannels():void {
 			if(!channel){ return; }
 			for(var i:int = oldChannels.length; i--;){
-				oldChannels[i].soundTransform = channel.soundTransform;			}
+				oldChannels[i].soundTransform = channel.soundTransform;	
+			}
 		}
 
-	
-
+		public function get soundTransform():SoundTransform {
+			if(!_soundTransform){ _soundTransform = new SoundTransform(mixedVolume, _pan); }
+			return _soundTransform;
+		}
+		
+		public function set soundTransform(value:SoundTransform):void {
+			if(value.volume > 0){ _muted = false; } 
+			else if(value.volume == 0){ _muted = true; }
+			channel.soundTransform = value;
+			updateOldChannels();
+		}
 		
 	}
 }

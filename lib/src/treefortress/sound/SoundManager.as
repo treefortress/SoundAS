@@ -6,6 +6,7 @@ package treefortress.sound
 	import flash.events.ProgressEvent;
 	import flash.media.Sound;
 	import flash.media.SoundLoaderContext;
+	import flash.media.SoundTransform;
 	import flash.net.URLRequest;
 	import flash.utils.Dictionary;
 	import flash.utils.getTimer;
@@ -30,6 +31,7 @@ package treefortress.sound
 		protected var _tickEnabled:Boolean;
 		protected var _mute:Boolean;
 		protected var _volume:Number;
+		protected var _pan:Number;
 		protected var _masterVolume:Number;
 		protected var _masterTween:SoundTween;
 		
@@ -200,6 +202,26 @@ package treefortress.sound
 		}
 		
 		/**
+		 * Set pan on all instances
+		 */
+		public function get pan():Number { return _pan; }
+		public function set pan(value:Number):void {
+			_pan = value;
+			for(var i:int = instances.length; i--;){
+				instances[i].pan = _pan;
+			}
+		}
+		
+		/**
+		 * Set soundTransform on all instances. 
+		 */
+		public function set soundTransform(value:SoundTransform):void {
+			for(var i:int = instances.length; i--;){
+				instances[i].soundTransform = value;
+			}
+		}
+		
+		/**
 		 * Returns a SoundInstance for a specific type.
 		 */
 		public function getSound(type:String, forceNew:Boolean = false):SoundInstance {
@@ -333,6 +355,7 @@ package treefortress.sound
 			
 			//Init collections
 			_volume = 1;
+			_pan = 0;
 			_masterVolume = 1;
 			instances = new <SoundInstance>[];
 			instancesBySound = new Dictionary(true);
