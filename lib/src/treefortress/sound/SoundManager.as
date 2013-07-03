@@ -362,7 +362,7 @@ package treefortress.sound
 			
 			var tween:SoundTween = new SoundTween(si, endVolume, duration);
 			tween.stopAtZero = stopAtZero;
-			tween.update(0);
+			tween.update(tween.startTime);
 			
 			//Add new tween
 			activeTweens.push(tween);

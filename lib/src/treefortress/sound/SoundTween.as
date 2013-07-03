@@ -41,6 +41,7 @@ package treefortress.sound
 				_isComplete = SoundAS.masterVolume == endVolume;
 				
 			} else {
+				trace(t - startTime);
 				if(t - startTime < duration){
 					sound.volume = easeOutQuad(t - startTime, startVolume, endVolume - startVolume, duration);
 				} else {

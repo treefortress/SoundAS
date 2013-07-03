@@ -88,12 +88,13 @@ package
 						
 						break;
 					
-					case Keyboard.NUMBER_3:2
+					case Keyboard.NUMBER_3:
 						trace("FADES: fade, fadeMultiple, fadeMaster");
 						SoundAS.playLoop(MUSIC, volume);
 						SoundAS.fadeFrom(MUSIC, 0, 1);
 						trace("fadeIn");
 						setTimeout(function(){
+							SoundAS.getSound(MUSIC).volume = .2;
 							SoundAS.fadeTo(MUSIC, 0);
 							trace("fadeOut");
 						}, 3000);
