@@ -59,7 +59,6 @@ package treefortress.sound
 		protected var _muted:Boolean;
 		protected var _volume:Number;
 		protected var _pan:Number;
-		protected var _masterVolume:Number;
 		protected var _enableSeamlessLoops:Boolean;
 		protected var pauseTime:Number;
 		protected var _isPlaying:Boolean;
@@ -76,7 +75,6 @@ package treefortress.sound
 			pauseTime = 0;
 			_volume = 1;	
 			_pan = 0;
-			_masterVolume = 1
 			_soundTransform = new SoundTransform();
 			soundCompleted = new Signal(SoundInstance);
 			oldChannels = new <SoundChannel>[];
@@ -214,7 +212,7 @@ package treefortress.sound
 		 * Combined masterVolume and volume levels
 		 */
 		public function get mixedVolume():Number {
-			return _volume * _masterVolume;
+			return _volume * manager.masterVolume;
 		}
 		
 		/**
@@ -265,16 +263,14 @@ package treefortress.sound
 			}
 		}
 		
+		public function get masterVolume():Number { return manager.masterVolume; }
+		
 		/**
-		 * Sets the master volume, which is multiplied with the current Volume level
+		 * Sets the master volume (the volume of the manager)
+		 * Note : this will affect all sounds managed by the same sound manager
 		 */
-		public function get masterVolume():Number { return _masterVolume; }
 		public function set masterVolume(value:Number):void {
-			if(_masterVolume == value){ return; }
-			if(value < 0){ value = 0; } else if(value > 1){ value = 1; }
-			_masterVolume = value;
-			//Call setter to update the volume
-			volume = _volume;
+			manager.masterVolume = value;
 		}
 		
 		/**
