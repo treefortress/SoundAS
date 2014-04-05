@@ -325,8 +325,10 @@ package treefortress.sound
 		public function get masterVolume():Number { return _masterVolume; }
 		public function set masterVolume(value:Number):void {
 			_masterVolume = value;
-			for(var i:int = instances.length; i--;){
-				instances[i].masterVolume = _masterVolume;
+			var sound:SoundInstance;
+			for (var i:int = instances.length; i--; ) {
+				sound = instances[i];
+				sound.volume = sound.volume;
 			}
 		}
 		
