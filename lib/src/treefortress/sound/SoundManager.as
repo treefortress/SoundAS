@@ -34,6 +34,7 @@ package treefortress.sound
 		protected var _pan:Number;
 		protected var _masterVolume:Number;
 		protected var _masterTween:SoundTween;
+		private var _searching:Boolean;
 		
 		public function SoundManager(){
 			init();
@@ -225,30 +226,36 @@ package treefortress.sound
 		 * Returns a SoundInstance for a specific type.
 		 */
 		public function getSound(type:String, forceNew:Boolean = false):SoundInstance {
-			if(type == null){ 
-				return null; 
-			}
-			//Try and retrieve instance from this manager.
-			var si:SoundInstance = instancesByType[type];
-			if(!si){
-				//If instance was not found, check out parent manager;
-				if(!si && parent){ si = parent.getSound(type); }
-				//Still not found, check the children.
-				if(!si && groups){
-					for(var i:int = groups.length; i--;){
-						si = groups[i].getSound(type);
-						if(si){ break; }
+			if(_searching){ return null; }
+			try{
+				_searching = true;
+				if(type == null){
+					return null;
+				}
+				//Try and retrieve instance from this manager.
+				var si:SoundInstance = instancesByType[type];
+				if(!si){
+					//If instance was not found, check out parent manager;
+					if(!si && parent){ si = parent.getSound(type); }
+					//Still not found, check the children.
+					if(!si && groups){
+						for(var i:int = groups.length; i--;){
+							si = groups[i].getSound(type);
+							if(si){ break; }
+						}
+					}
+					//If we've found it, add it to our local instance list:
+					if(si && instances.indexOf(si) == -1){
+						addInstance(si);
 					}
 				}
-				//If we've found it, add it to our local instance list:
-				if(si && instances.indexOf(si) == -1){
-					addInstance(si);
+				if(!si){ throw(new Error("[SoundAS] Sound with type '"+type+"' does not appear to be loaded.")); }
+				if(forceNew){
+					si = si.clone();
 				}
+			}finally{
+				_searching = false;
 			}
-			if(!si){ throw(new Error("[SoundAS] Sound with type '"+type+"' does not appear to be loaded.")); }
-			if(forceNew){
-				si = si.clone();	
-			} 
 			return si;
 		}
 		
