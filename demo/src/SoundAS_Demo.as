@@ -256,6 +256,16 @@ package
 						
 						break;
 					
+					case Keyboard.NUMBER_7:
+						trace("GROUPS: MUSIC and SOLOS. Should throw a sound missing error instead of a Stack overflow.");
+
+						var music:SoundManager = SoundAS.group("music");
+						var solos:SoundManager = SoundAS.group("solos");
+
+						SoundAS.play("missing", 1);
+
+						break;
+
 					case Keyboard.NUMBER_8:
 						trace("isPlaying / isPaused");
 						
