@@ -325,12 +325,11 @@ package treefortress.sound
 					soundCompleted.dispatch(this);
 				}
 			}
-			//Clear out any old channels...
-			for(var i:int = oldChannels.length; i--;){
-				if(channel.position == sound.length){
-					stopChannel(channel);
-					oldChannels.splice(i, 1);
-				}
+			
+			stopChannel( channel );
+			var index:int = oldChannels.indexOf( channel );
+			if( index >= 0 ) {
+				oldChannels.splice( index, 1 );
 			}
 		}
 		
