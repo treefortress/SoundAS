@@ -89,7 +89,7 @@ package treefortress.sound
 		 * Convenience function to play a sound that can have overlapping instances (ie click or soundFx).
 		 */
 		public function playFx(type:String, volume:Number = 1, startTime:Number = 0, loops:int = 0):SoundInstance {
-			return play(type, volume, startTime, 0, true);
+			return play(type, volume, startTime, loops, true);
 		}
 		
 		/**
