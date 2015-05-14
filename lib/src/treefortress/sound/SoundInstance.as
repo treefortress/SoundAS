@@ -293,7 +293,9 @@ package treefortress.sound
 			_soundTransform = null;
 			stopChannel(channel);
 			channel = null;
-			fade.end(false);
+
+			if ( fade )
+				fade.end(false);
 		}
 		
 		/**
