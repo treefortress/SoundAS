@@ -72,7 +72,7 @@ Controls playback of individual sounds, allowing you to easily stop, start, resu
     SoundAS.loadSound("assets/Click.mp3", "click");
 
     //Inject an already loaded Sound instance
-    SoundAS.addSound(clickSound, "click");
+    SoundAS.addSound("click", clickSound);
 
 ###Basic Playback
 
