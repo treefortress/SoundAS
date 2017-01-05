@@ -219,7 +219,7 @@ package treefortress.sound
 		 * Indicates whether this sound is currently paused.
 		 */
 		public function get isPaused():Boolean {
-			return channel && sound && pauseTime > 0 && pauseTime < sound.length;
+			return channel && sound && pauseTime >= 0 && pauseTime < sound.length;
 		}
 		
 		/**
